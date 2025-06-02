@@ -6,4 +6,5 @@ scikit-learn
 pyyaml
 tqdm
 peft>=0.10.0
+wandb
 
