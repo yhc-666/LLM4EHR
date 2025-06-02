@@ -10,6 +10,12 @@ from accelerate import Accelerator
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup
+from tqdm.auto import tqdm
+
+try:
+    import wandb
+except ImportError:  # pragma: no cover - wandb optional
+    wandb = None
 
 from .data.loader import MIMICDataset
 from .data.collate import collate_fn
@@ -20,11 +26,16 @@ from .utils import Config, parse_config_yaml, save_checkpoint, set_seed
 
 def evaluate(
     accelerator: Accelerator, model: LlamaMeanPool, dataloader: DataLoader, cfg: Config
-) -> float:
+) -> Dict[str, float]:
     model.eval()
     preds, targets = [], []
+    loader = tqdm(
+        dataloader,
+        disable=not accelerator.is_local_main_process,
+        desc="Validation",
+    )
     with torch.no_grad():
-        for batch in dataloader:
+        for batch in loader:
             batch = {k: v.to(accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
             logits = accelerator.gather(outputs.logits).cpu().numpy()
@@ -35,12 +46,10 @@ def evaluate(
     target_arr = np.concatenate(targets, axis=0)
     if cfg.task == "ihm":
         metrics = binary_metrics(pred_arr, target_arr)
-        f1 = metrics["F1"]
     else:
         metrics = multilabel_metrics(pred_arr, target_arr)
-        f1 = metrics["macro_F1"]
     accelerator.print({k: f"{v:.4f}" for k, v in metrics.items()})
-    return f1
+    return metrics
 
 
 def main(config_path: str) -> None:
@@ -82,9 +91,18 @@ def main(config_path: str) -> None:
     )
 
     best_f1 = 0.0
+    global_step = 0
+    if cfg.wandb and wandb is not None and accelerator.is_main_process:
+        wandb.init(project="LLM4EHR", config=cfg.__dict__)
+
     for epoch in range(cfg.num_epochs):
         model.train()
-        for step, batch in enumerate(train_loader):
+        progress = tqdm(
+            train_loader,
+            disable=not accelerator.is_local_main_process,
+            desc=f"Epoch {epoch}",
+        )
+        for step, batch in enumerate(progress):
             batch = {k: v.to(accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
             loss = outputs.loss
@@ -93,9 +111,15 @@ def main(config_path: str) -> None:
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
-            if step % 10 == 0:
-                accelerator.print(f"Epoch {epoch} Step {step} Loss {loss.item():.4f}")
-        f1 = evaluate(accelerator, model, val_loader, cfg)
+            progress.set_postfix(loss=loss.item())
+            if cfg.wandb and wandb is not None and accelerator.is_main_process:
+                wandb.log({"train_loss": loss.item(), "step": global_step})
+            global_step += 1
+
+        val_metrics = evaluate(accelerator, model, val_loader, cfg)
+        if cfg.wandb and wandb is not None and accelerator.is_main_process:
+            wandb.log({f"val_{k}": v for k, v in val_metrics.items()}, step=global_step)
+        f1 = val_metrics["F1"] if cfg.task == "ihm" else val_metrics["macro_F1"]
         if accelerator.is_main_process and f1 > best_f1:
             best_f1 = f1
             path = Path(cfg.save_path) / "best.pt"
