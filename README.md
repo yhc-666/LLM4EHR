@@ -38,7 +38,7 @@ LLM4EHR/
 ```
 
 ## Dataset Format
-首先我在预处理后得到ihm/pheno 分别的下游prediction任务数据集，每个数据集被切分为train/val/test，以pkl格式存储于'PKL_PATH'
+首先我在预处理后得到ihm/pheno 分别的下游prediction任务数据集，每个数据集被切分为train/val/test，以pkl格式存储于'DATAROOT'
 
 1. 48h ihm prediction：对应train_p2x_data.pkl, val_p2x_data.pkl, test_p2x_data.pkl
 
