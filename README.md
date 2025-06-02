@@ -1,9 +1,11 @@
 # LLM4EHR
 LLM4EHR is a minimal-yet-extensible PyTorch codebase for benchmarking long-context LLMs on two classic ICU prediction tasks using the MIMIC-III / IV datasets:
 
-Task	Horizon & Labels	Input Modalities (used today)
-48-hour In-Hospital Mortality (IHM)	binary (0 / 1)	5 clinical notes per stay (≈ 2 500 tokens)
-24-hour Phenotype Classification (Pheno)	25× multi-label	5 clinical notes per stay
+| Task                                         | Horizon & Labels | Input Modalities (used today)                |
+| -------------------------------------------- | ---------------- | -------------------------------------------- |
+| **48-hour In-Hospital Mortality (IHM)**      | binary (0 / 1)   | *N clinical notes* per stay (≈ 4000 tokens) |
+| **24-hour Phenotype Classification (Pheno)** | 25× multi-label  | *N clinical notes* per stay                  |
+
 
 The current baseline feeds all notes into Meta-Llama-3-8B (optionally 4-bit + LoRA) and aggregates its final hidden states with masked mean pooling → linear head.
 
