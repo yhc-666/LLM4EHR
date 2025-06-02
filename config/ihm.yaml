@@ -2,9 +2,9 @@ train_pkl: ${DATA_ROOT}/train_p2x_data.pkl
 val_pkl: ${DATA_ROOT}/val_p2x_data.pkl
 test_pkl: ${DATA_ROOT}/test_p2x_data.pkl
 
-save_path: ihm_model
+save_path: models/ihm_model
 
-max_seq_len: 4096
+max_seq_len: 8000
 batch_size: 4
 num_epochs: 5
 lr: 2e-5
@@ -15,8 +15,44 @@ pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct
 use_4bit: true
 lora:
   r: 8
-  alpha: 32
-  dropout: 0.05
+  lora_alpha: 32
+  lora_dropout: 0.05
 task: ihm
 num_labels: 1
 wandb: true
+mixed_precision: "fp16"  # 可选: "no", "fp16", "bf16"
+
+"""
+关于Qlora与混合精度
+╔══════════════════╗
+║  计算时          ║   绝大多数算子 → 16-bit (FP16 或 BF16)
+║                  ║   关键累积 / loss → 32-bit (FP32)
+╚══════════════════╝
+         ▲
+         │ bitsandbytes 内核
+         ▼
+╔══════════════════╗
+║  存储时          ║   冻结的基座权重 → 4-bit 量化
+╚══════════════════╝
+
+**混合精度 (AMP)**
+
+含义：在一次前向 / 反向里 同时使用 16-bit (FP16 或 BF16) 和 32-bit (FP32) 浮点数。
+
+混合对象
+  1. 计算张量
+    FP16 / BF16 → 大部分矩阵乘、Softmax、激活、LoRA adapter 权重
+    FP32 → loss 计算、梯度累积、部分归一化统计
+  2. 自动管理: autocast 负责张量降精度; GradScaler 负责缩 / 反缩梯度，防下溢。
+
+**QLoRA 的额外"存-算混用"**
+
+加载时: load_in_4bit=True → Base LLM 权重以 int4 存储，显存压缩 ≈ ×4–6。
+计算时: bitsandbytes kernel 即时把 int4 → 16-bit (FP16 / BF16)，算完即丢。
+
+\| 层级 | 精度 | 作用 | 备注 |
+\|------|------|------|------|
+\| **存储** | int4 | 冻结 Base 权重 | 仅占显存，不训练 |
+\| **计算主力** | FP16 / BF16 | 激活、LoRA adapter、解量化临时权重 | `autocast` 控制 |
+\| **关键累积** | FP32 | loss 与梯度缓冲 | `GradScaler` 控制 |
+"""

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import random
 import yaml
+import re
 from dataclasses import dataclass
 from typing import Any, Dict
 
@@ -45,6 +46,7 @@ class Config:
     task: str
     num_labels: int
     wandb: bool
+    mixed_precision: str = "no"  # 支持 "no", "fp16", "bf16"
 
 
 def parse_config_yaml(path: str) -> Config:
@@ -52,8 +54,14 @@ def parse_config_yaml(path: str) -> Config:
     with open(path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
+    # 只对包含 ${...} 模式的字符串进行环境变量展开
     for key, value in data.items():
-        if isinstance(value, str):
+        if isinstance(value, str) and "${" in value:
             data[key] = os.path.expandvars(value)
+        elif isinstance(value, str) and re.match(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$', value):
+            try:
+                data[key] = float(value)
+            except ValueError:
+                pass  # 如果转换失败，保持原值
     return Config(**data)
 

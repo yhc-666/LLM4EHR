@@ -11,11 +11,7 @@ from torch.optim import AdamW
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup
 from tqdm.auto import tqdm
-
-try:
-    import wandb
-except ImportError:  # pragma: no cover - wandb optional
-    wandb = None
+import wandb
 
 from .data.loader import MIMICDataset
 from .data.collate import collate_fn
@@ -54,8 +50,14 @@ def evaluate(
 
 def main(config_path: str) -> None:
     cfg = parse_config_yaml(config_path)
-    accelerator = Accelerator()
+    accelerator = Accelerator(mixed_precision=cfg.mixed_precision)
     set_seed(42)
+
+    if accelerator.is_main_process:
+        if cfg.mixed_precision != "no":
+            print(f"train with mixed precision: {cfg.mixed_precision}")
+        else:
+            print("train with full precision")
 
     model = LlamaMeanPool(
         cfg.pretrained_meta_model,

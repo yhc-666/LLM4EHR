@@ -1,0 +1,41 @@
+Epoch 0:   0%|                                                                                              | 0/11582 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
+  labels_tensor = torch.tensor(labels, dtype=torch.float32)
+/home/ubuntu/.local/lib/python3.10/site-packages/bitsandbytes/nn/modules.py:463: UserWarning: Input type into Linear4bit is torch.float16, but bnb_4bit_compute_dtype=torch.float32 (default). This will lead to slow inference or training speed.
+  warnings.warn(
+Epoch 0:   5%|███▍                                                                  | 572/11582 [04:27<1:25:47,  2.14it/s, loss=0.416]
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 135, in <module>
+    main(args.config)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 109, in main
+    outputs = model(**batch)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/accelerate/utils/operations.py", line 818, in forward
+    return model_forward(*args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/accelerate/utils/operations.py", line 806, in __call__
+    return convert_to_fp32(self.model_forward(*args, **kwargs))
+  File "/usr/lib/python3/dist-packages/torch/amp/autocast_mode.py", line 44, in decorate_autocast
+    return func(*args, **kwargs)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/models/llama_mean.py", line 68, in forward
+    outputs = self.model.model(
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/utils/generic.py", line 969, in wrapper
+    output = func(self, *args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/llama/modeling_llama.py", line 704, in forward
+    logits = self.lm_head(hidden_states[:, slice_indices, :])
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.31 GiB. GPU 0 has a total capacity of 94.50 GiB of which 2.30 GiB is free. Including non-PyTorch memory, this process has 92.15 GiB memory in use. Of the allocated memory 87.58 GiB is allocated by PyTorch, and 3.82 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

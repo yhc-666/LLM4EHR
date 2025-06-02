@@ -47,7 +47,16 @@ class LlamaMeanPool(nn.Module):
         self.tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
             model_name, use_fast=True
         )
+        
+        # Llama 模型的 tokenizer 没有默认的 padding token，需要手动设置
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        
+        # left padding 更合适
+        self.tokenizer.padding_side = "left"
+
         hidden = self.model.config.hidden_size
+
         self.classifier = nn.Linear(hidden, num_labels)
 
     def forward(

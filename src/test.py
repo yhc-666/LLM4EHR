@@ -16,7 +16,7 @@ from .utils import parse_config_yaml, set_seed
 
 def main(config_path: str) -> None:
     cfg = parse_config_yaml(config_path)
-    accelerator = Accelerator()
+    accelerator = Accelerator(mixed_precision=cfg.mixed_precision)
     set_seed(42)
 
     model = LlamaMeanPool(
