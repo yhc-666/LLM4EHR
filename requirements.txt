@@ -1,0 +1,9 @@
+transformers>=4.40.0
+accelerate>=0.28.0
+torch>=2.1
+numpy
+scikit-learn
+pyyaml
+tqdm
+peft>=0.10.0
+

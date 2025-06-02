@@ -1,0 +1,22 @@
+train_pkl: ${DATA_ROOT}/train_p2x_data.pkl
+val_pkl: ${DATA_ROOT}/val_p2x_data.pkl
+test_pkl: ${DATA_ROOT}/test_p2x_data.pkl
+
+save_path: ihm_model
+
+max_seq_len: 4096
+batch_size: 4
+num_epochs: 5
+lr: 2e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+grad_accum: 1
+pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct
+use_4bit: true
+lora:
+  r: 8
+  alpha: 32
+  dropout: 0.05
+task: ihm
+num_labels: 1
+wandb: true
