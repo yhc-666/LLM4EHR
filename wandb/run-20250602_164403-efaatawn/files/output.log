@@ -1,0 +1,7 @@
+Epoch 0:   0%|                                                                                                                  | 0/5791 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
+  labels_tensor = torch.tensor(labels, dtype=torch.float32)
+Epoch 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 5791/5791 [1:40:23<00:00,  1.04s/it, loss=0.43]
+Validation: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████| 1270/1270 [06:36<00:00,  3.20it/s]
+{'macro_AUROC': '0.8180', 'macro_AUPRC': '0.5332', 'micro_F1': '0.5068', 'macro_F1': '0.4358'}
+Epoch 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████| 5791/5791 [1:40:29<00:00,  1.04s/it, loss=0.463]
+Validation:  73%|█████████████████████████████████████████████████████████████████████████▉                           | 929/1270 [05:00<01:31,  3.74it/s]

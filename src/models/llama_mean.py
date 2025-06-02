@@ -32,18 +32,31 @@ class LlamaMeanPool(nn.Module):
     ) -> None:
         super().__init__()
         quant_cfg = (
-            BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_use_double_quant=True)
+            BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+            )
             if use_4bit
             else None
         )
+
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             quantization_config=quant_cfg,
+            torch_dtype=torch.bfloat16,
             device_map="auto",
+            use_cache=False,
         )
+
         if lora_cfg is not None:
             lora_config = LoraConfig(**lora_cfg)
             self.model = get_peft_model(self.model, lora_config)
+
+        self.model.gradient_checkpointing_enable()  # 节省大量激活显存!!!(影响最大)  
+        self.model.enable_input_require_grads()     # 让 checkpoint 反向链路完整
+
         self.tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
             model_name, use_fast=True
         )
@@ -65,7 +78,7 @@ class LlamaMeanPool(nn.Module):
         attention_mask: torch.Tensor,
         labels: Optional[torch.Tensor] = None,
     ) -> LlamaOutputs:
-        outputs = self.model.model(
+        outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
             output_hidden_states=True,

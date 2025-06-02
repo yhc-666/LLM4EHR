@@ -25,29 +25,32 @@ def main(config_path: str) -> None:
         use_4bit=cfg.use_4bit,
         lora_cfg=cfg.lora,
     )
+    
     path = Path(cfg.save_path) / "best.pt"
     if path.exists():
         state = torch.load(path, map_location="cpu")
-        model.load_state_dict(state)
+        missing, unexpected = model.load_state_dict(state, strict=False)
+        assert not missing, f"有 {len(missing)} 个真实参数缺失！"
+        print(f"忽略 {len(unexpected)} 个 bitsandbytes 缓冲区")
     tokenizer = model.tokenizer
 
-    val_ds = MIMICDataset(cfg.val_pkl, cfg.task)
-    val_loader = DataLoader(
-        val_ds,
+    test_ds = MIMICDataset(cfg.test_pkl, cfg.task)
+    test_loader = DataLoader(
+        test_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
         collate_fn=collate_fn(tokenizer, cfg.max_seq_len),
     )
 
-    model, val_loader = accelerator.prepare(model, val_loader)
+    model, test_loader = accelerator.prepare(model, test_loader)
     model.eval()
     preds, labels = [], []
     with torch.no_grad():
-        for batch in val_loader:
+        for batch in test_loader:
             batch = {k: v.to(accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
-            logits = accelerator.gather(outputs.logits).cpu().numpy()
-            label = accelerator.gather(batch["labels"]).cpu().numpy()
+            logits = accelerator.gather(outputs.logits).cpu().float().numpy()
+            label = accelerator.gather(batch["labels"]).cpu().float().numpy()
             preds.append(logits)
             labels.append(label)
     pred = torch.tensor(preds).reshape(-1, cfg.num_labels).numpy()

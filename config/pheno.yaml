@@ -5,12 +5,12 @@ test_pkl: ${DATA_ROOT}/test_p2x_data.pkl
 save_path: models/pheno_model
 
 max_seq_len: 6000
-batch_size: 2
+batch_size: 4
 num_epochs: 5
 lr: 2e-5
 weight_decay: 0.01
 warmup_ratio: 0.1
-grad_accum: 1
+grad_accum: 2
 pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct
 use_4bit: true
 lora:

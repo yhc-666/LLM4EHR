@@ -34,8 +34,8 @@ def evaluate(
         for batch in loader:
             batch = {k: v.to(accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
-            logits = accelerator.gather(outputs.logits).cpu().numpy()
-            labels = accelerator.gather(batch["labels"]).cpu().numpy()
+            logits = accelerator.gather(outputs.logits).cpu().float().numpy()
+            labels = accelerator.gather(batch["labels"]).cpu().float().numpy()
             preds.append(logits)
             targets.append(labels)
     pred_arr = np.concatenate(preds, axis=0)

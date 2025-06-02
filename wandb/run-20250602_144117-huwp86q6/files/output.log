@@ -1,0 +1,16 @@
+Epoch 0:   0%|                                                                                                                  | 0/5791 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
+  labels_tensor = torch.tensor(labels, dtype=torch.float32)
+Epoch 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 5791/5791 [1:40:30<00:00,  1.04s/it, loss=0.43]
+Validation:   0%|                                                                                                               | 0/1270 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 135, in <module>
+    main(args.config)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 121, in main
+    val_metrics = evaluate(accelerator, model, val_loader, cfg)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 37, in evaluate
+    logits = accelerator.gather(outputs.logits).cpu().numpy()
+TypeError: Got unsupported ScalarType BFloat16

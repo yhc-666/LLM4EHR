@@ -1,0 +1,7 @@
+{"time":"2025-06-02T16:44:03.921254508Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"/home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250602_164403-efaatawn/logs/debug-core.log"}
+{"time":"2025-06-02T16:44:04.077765718Z","level":"INFO","msg":"created new stream","id":"efaatawn"}
+{"time":"2025-06-02T16:44:04.077803255Z","level":"INFO","msg":"stream: started","id":"efaatawn"}
+{"time":"2025-06-02T16:44:04.077824119Z","level":"INFO","msg":"writer: Do: started","stream_id":"efaatawn"}
+{"time":"2025-06-02T16:44:04.077846615Z","level":"INFO","msg":"sender: started","stream_id":"efaatawn"}
+{"time":"2025-06-02T16:44:04.077858519Z","level":"INFO","msg":"handler: started","stream_id":"efaatawn"}
+{"time":"2025-06-02T16:44:04.242373388Z","level":"INFO","msg":"Starting system monitor"}

@@ -1,0 +1,25 @@
+Epoch 0:   0%|                                                                                                                  | 0/7721 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
+  labels_tensor = torch.tensor(labels, dtype=torch.float32)
+Epoch 0:   0%|                                                                                                                  | 0/7721 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 135, in <module>
+    main(args.config)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 109, in main
+    outputs = model(**batch)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/accelerate/utils/operations.py", line 818, in forward
+    return model_forward(*args, **kwargs)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/accelerate/utils/operations.py", line 806, in __call__
+    return convert_to_fp32(self.model_forward(*args, **kwargs))
+  File "/usr/lib/python3/dist-packages/torch/amp/autocast_mode.py", line 44, in decorate_autocast
+    return func(*args, **kwargs)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/models/llama_mean.py", line 86, in forward
+    last_hidden = outputs.last_hidden_state
+AttributeError: 'CausalLMOutputWithPast' object has no attribute 'last_hidden_state'

@@ -1,0 +1,13 @@
+Epoch 0:   0%|                                                                                                                  | 0/7721 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
+  labels_tensor = torch.tensor(labels, dtype=torch.float32)
+Epoch 0:   2%|█▍                                                                                        | 127/7721 [01:35<1:35:35,  1.32it/s, loss=0.827]
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 135, in <module>
+    main(args.config)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 116, in main
+    progress.set_postfix(loss=loss.item())
+KeyboardInterrupt

@@ -1,0 +1,16 @@
+{"time":"2025-06-02T14:41:17.839352093Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"/home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250602_144117-huwp86q6/logs/debug-core.log"}
+{"time":"2025-06-02T14:41:17.993157694Z","level":"INFO","msg":"created new stream","id":"huwp86q6"}
+{"time":"2025-06-02T14:41:17.993198206Z","level":"INFO","msg":"stream: started","id":"huwp86q6"}
+{"time":"2025-06-02T14:41:17.993209439Z","level":"INFO","msg":"writer: Do: started","stream_id":"huwp86q6"}
+{"time":"2025-06-02T14:41:17.993226463Z","level":"INFO","msg":"sender: started","stream_id":"huwp86q6"}
+{"time":"2025-06-02T14:41:17.993248959Z","level":"INFO","msg":"handler: started","stream_id":"huwp86q6"}
+{"time":"2025-06-02T14:41:18.195949454Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-02T16:20:03.495383989Z","level":"INFO","msg":"api: retrying HTTP error","status":502,"url":"https://api.wandb.ai/files/hcy50662-national-university-of-singapore-students-union/LLM4EHR/huwp86q6/file_stream","body":"\n<html><head>\n<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\n<title>502 Server Error</title>\n</head>\n<body text=#000000 bgcolor=#ffffff>\n<h1>Error: Server Error</h1>\n<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>\n<h2></h2>\n</body></html>\n"}
+{"time":"2025-06-02T16:21:49.470034128Z","level":"INFO","msg":"stream: closing","id":"huwp86q6"}
+{"time":"2025-06-02T16:21:49.470096432Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-02T16:21:49.470758198Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-02T16:21:49.811442099Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-02T16:21:49.89523243Z","level":"INFO","msg":"handler: closed","stream_id":"huwp86q6"}
+{"time":"2025-06-02T16:21:49.895259854Z","level":"INFO","msg":"sender: closed","stream_id":"huwp86q6"}
+{"time":"2025-06-02T16:21:49.895257838Z","level":"INFO","msg":"writer: Close: closed","stream_id":"huwp86q6"}
+{"time":"2025-06-02T16:21:49.897906117Z","level":"INFO","msg":"stream: closed","id":"huwp86q6"}
