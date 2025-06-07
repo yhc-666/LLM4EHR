@@ -16,7 +16,7 @@ class LongformerOutputs:
 
 
 class ClinicalLongformerPool(nn.Module):
-    """Clinical Longformer with masked mean pooling head."""
+    """Clinical Longformer with configurable pooling head."""
 
     def __init__(
         self,
@@ -24,6 +24,7 @@ class ClinicalLongformerPool(nn.Module):
         num_labels: int,
         use_4bit: bool = False,
         lora_cfg: Optional[Dict[str, int]] = None,
+        pooling: str = "mean",
     ) -> None:
         super().__init__()
         quant_cfg = (
@@ -36,6 +37,11 @@ class ClinicalLongformerPool(nn.Module):
             if use_4bit
             else None
         )
+
+        self.pooling = pooling.lower()
+        if self.pooling not in {"mean", "cls"}:
+            raise ValueError("pooling must be 'mean' or 'cls'")
+
 
         self.model = AutoModel.from_pretrained(
             model_name,
@@ -71,6 +77,7 @@ class ClinicalLongformerPool(nn.Module):
         global_attention_mask: torch.Tensor,
         labels: Optional[torch.Tensor] = None,
     ) -> LongformerOutputs:
+        print("global_attention_mask:", global_attention_mask)
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -78,8 +85,11 @@ class ClinicalLongformerPool(nn.Module):
             output_hidden_states=True,
         )
         last_hidden = outputs.last_hidden_state
-        mask = attention_mask.unsqueeze(-1)
-        pooled = (last_hidden * mask).sum(1) / mask.sum(1)
+        if self.pooling == "mean":
+            mask = attention_mask.unsqueeze(-1)
+            pooled = (last_hidden * mask).sum(1) / mask.sum(1)
+        else:
+            pooled = last_hidden[:, 0]
         logits = self.classifier(pooled)
 
         loss = None

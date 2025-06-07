@@ -5,17 +5,25 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 save_path: models/pheno_clinical_longformer
 
 max_seq_len: 4096
-batch_size: 4
-num_epochs: 5
+batch_size: 8
+num_epochs: 25
 lr: 2e-5
 weight_decay: 0.01
 warmup_ratio: 0.1
 grad_accum: 2
 pretrained_meta_model: yikuan8/Clinical-Longformer
 use_4bit: false
-lora: null
+lora:
+    null
+    # r: 8
+    # lora_alpha: 16
+    # lora_dropout: 0.05
+    # target_modules: ["query", "key", "value"]
+    # bias: "none"
+    # task_type: "SEQ_CLS"
 model_type: clinicallongformer
+pooling: cls # 'mean' or 'cls'
 task: pheno
 num_labels: 25
-wandb: false
+wandb: true
 mixed_precision: "bf16"  # 可选: "no", "fp16", "bf16"

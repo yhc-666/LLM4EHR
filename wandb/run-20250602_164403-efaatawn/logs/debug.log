@@ -20,3 +20,4 @@ config: {'train_pkl': '/home/ubuntu/hcy50662/output_mimic3/pheno/train_p2x_data.
 2025-06-02 16:44:04,330 INFO    MainThread:45467 [wandb_run.py:_redirect():2490] Wrapping output streams.
 2025-06-02 16:44:04,331 INFO    MainThread:45467 [wandb_run.py:_redirect():2513] Redirects installed.
 2025-06-02 16:44:04,332 INFO    MainThread:45467 [wandb_init.py:init():1150] run started, returning control to user process
+2025-06-03 01:39:46,661 INFO    MsgRouterThr:45467 [mailbox.py:close():129] [no run ID] Closing mailbox, abandoning 1 handles.

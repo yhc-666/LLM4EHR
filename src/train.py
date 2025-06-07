@@ -74,6 +74,7 @@ def main(config_path: str) -> None:
             cfg.num_labels,
             use_4bit=cfg.use_4bit,
             lora_cfg=cfg.lora,
+            pooling=cfg.pooling,
         )
     else:
         raise ValueError("unknown model_type")

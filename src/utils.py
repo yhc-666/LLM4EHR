@@ -48,6 +48,7 @@ class Config:
     num_labels: int
     wandb: bool
     mixed_precision: str = "no"  # 支持 "no", "fp16", "bf16"
+    pooling: str = "mean"
 
 
 def parse_config_yaml(path: str) -> Config:
