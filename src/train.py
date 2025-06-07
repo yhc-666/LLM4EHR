@@ -6,6 +6,7 @@ from typing import Dict
 
 import numpy as np
 import torch
+from torch import nn
 from accelerate import Accelerator
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
@@ -16,12 +17,13 @@ import wandb
 from .data.loader import MIMICDataset
 from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
+from .models.clinicallongformer import ClinicalLongformerPool
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import Config, parse_config_yaml, save_checkpoint, set_seed
 
 
 def evaluate(
-    accelerator: Accelerator, model: LlamaMeanPool, dataloader: DataLoader, cfg: Config
+    accelerator: Accelerator, model: nn.Module, dataloader: DataLoader, cfg: Config
 ) -> Dict[str, float]:
     model.eval()
     preds, targets = [], []
@@ -59,12 +61,22 @@ def main(config_path: str) -> None:
         else:
             print("train with full precision")
 
-    model = LlamaMeanPool(
-        cfg.pretrained_meta_model,
-        cfg.num_labels,
-        use_4bit=cfg.use_4bit,
-        lora_cfg=cfg.lora,
-    )
+    if cfg.model_type == "llama":
+        model = LlamaMeanPool(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
+        )
+    elif cfg.model_type == "clinicallongformer":
+        model = ClinicalLongformerPool(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
+        )
+    else:
+        raise ValueError("unknown model_type")
     tokenizer = model.tokenizer
 
     train_ds = MIMICDataset(cfg.train_pkl, cfg.task)
@@ -74,13 +86,13 @@ def main(config_path: str) -> None:
         train_ds,
         batch_size=cfg.batch_size,
         shuffle=True,
-        collate_fn=collate_fn(tokenizer, cfg.max_seq_len),
+        collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
     )
     val_loader = DataLoader(
         val_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
-        collate_fn=collate_fn(tokenizer, cfg.max_seq_len),
+        collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
     )
 
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)

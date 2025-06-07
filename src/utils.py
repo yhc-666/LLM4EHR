@@ -43,6 +43,7 @@ class Config:
     pretrained_meta_model: str
     use_4bit: bool
     lora: Dict[str, Any] | None
+    model_type: str
     task: str
     num_labels: int
     wandb: bool
