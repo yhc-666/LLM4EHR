@@ -1,0 +1,7 @@
+{"time":"2025-06-07T22:48:21.82751525Z","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"/home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250607_224821-rv5hhydf/logs/debug-core.log"}
+{"time":"2025-06-07T22:48:21.982638746Z","level":"INFO","msg":"stream: created new stream","id":"rv5hhydf"}
+{"time":"2025-06-07T22:48:21.982674106Z","level":"INFO","msg":"stream: started","id":"rv5hhydf"}
+{"time":"2025-06-07T22:48:21.982694811Z","level":"INFO","msg":"handler: started","stream_id":"rv5hhydf"}
+{"time":"2025-06-07T22:48:21.982685786Z","level":"INFO","msg":"writer: Do: started","stream_id":"rv5hhydf"}
+{"time":"2025-06-07T22:48:21.982717851Z","level":"INFO","msg":"sender: started","stream_id":"rv5hhydf"}
+{"time":"2025-06-07T22:48:22.100222311Z","level":"INFO","msg":"Starting system monitor"}

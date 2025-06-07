@@ -1,7 +1,7 @@
 Epoch 0:   0%|                                                        | 0/2896 [00:00<?, ?it/s]/home/ubuntu/hcy50662/LLM4EHR/src/data/collate.py:35: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at ./torch/csrc/utils/tensor_new.cpp:254.)
   labels_tensor = torch.tensor(labels, dtype=torch.float32)
 Input ids are automatically padded to be a multiple of `config.attention_window`: 512
-Epoch 0:  39%|████████████▊                    | 1124/2896 [14:58<23:36,  1.25it/s, loss=0.695]
+Epoch 0:  20%|██████▊                           | 583/2896 [10:28<41:35,  1.08s/it, loss=0.676]
 Traceback (most recent call last):
   File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
     return _run_code(code, main_globals, None,
@@ -61,8 +61,8 @@ Traceback (most recent call last):
     return self._call_impl(*args, **kwargs)
   File "/usr/lib/python3/dist-packages/torch/nn/modules/module.py", line 1750, in _call_impl
     return forward_call(*args, **kwargs)
-  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/longformer/modeling_longformer.py", line 589, in forward
-    ) = self._get_global_attn_indices(is_index_global_attn)
-  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/longformer/modeling_longformer.py", line 927, in _get_global_attn_indices
-    is_local_index_global_attn_nonzero = is_local_index_global_attn.nonzero(as_tuple=True)
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/longformer/modeling_longformer.py", line 564, in forward
+    diagonal_mask = self._sliding_chunks_query_key_matmul(
+  File "/home/ubuntu/.local/lib/python3.10/site-packages/transformers/models/longformer/modeling_longformer.py", line 862, in _sliding_chunks_query_key_matmul
+    self._mask_invalid_locations(diagonal_attention_scores, window_overlap)
 KeyboardInterrupt
