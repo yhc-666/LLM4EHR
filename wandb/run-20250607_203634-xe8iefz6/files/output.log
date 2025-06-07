@@ -7,4 +7,20 @@ Validation: 100%|█████████████████████
 Epoch 1: 100%|████████████████████████████████████████████████████████████████████████████████████████████| 2896/2896 [24:11<00:00,  1.99it/s, loss=0.374]
 Validation: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████| 635/635 [01:12<00:00,  8.70it/s]
 {'macro_AUROC': '0.5238', 'macro_AUPRC': '0.1808', 'micro_F1': '0.0000', 'macro_F1': '0.0000'}
-Epoch 2:  58%|█████████████████████████████████████████████████████▌                                      | 1686/2896 [13:55<11:40,  1.73it/s, loss=0.534]
+Epoch 2: 100%|████████████████████████████████████████████████████████████████████████████████████████████| 2896/2896 [24:06<00:00,  2.00it/s, loss=0.366]
+Validation: 100%|████████████████████████████████████████████| 635/635 [01:12<00:00,  8.73it/s]
+{'macro_AUROC': '0.5591', 'macro_AUPRC': '0.2009', 'micro_F1': '0.0000', 'macro_F1': '0.0000'}
+Epoch 3: 100%|█████████████████████████████████| 2896/2896 [26:03<00:00,  1.85it/s, loss=0.423]
+Validation: 100%|████████████████████████████████████████████| 635/635 [01:13<00:00,  8.69it/s]
+{'macro_AUROC': '0.5980', 'macro_AUPRC': '0.2274', 'micro_F1': '0.0000', 'macro_F1': '0.0000'}
+Epoch 4:  14%|████▊                             | 405/2896 [03:23<20:50,  1.99it/s, loss=0.369]
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 148, in <module>
+    main(args.config)
+  File "/home/ubuntu/hcy50662/LLM4EHR/src/train.py", line 129, in main
+    progress.set_postfix(loss=loss.item())
+KeyboardInterrupt

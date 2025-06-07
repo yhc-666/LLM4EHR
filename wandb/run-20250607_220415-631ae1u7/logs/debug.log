@@ -1,0 +1,22 @@
+2025-06-07 22:04:15,921 INFO    MainThread:32324 [wandb_setup.py:_flush():81] Current SDK version is 0.20.1
+2025-06-07 22:04:15,921 INFO    MainThread:32324 [wandb_setup.py:_flush():81] Configure stats pid to 32324
+2025-06-07 22:04:15,921 INFO    MainThread:32324 [wandb_setup.py:_flush():81] Loading settings from /home/ubuntu/.config/wandb/settings
+2025-06-07 22:04:15,923 INFO    MainThread:32324 [wandb_setup.py:_flush():81] Loading settings from /home/ubuntu/hcy50662/LLM4EHR/wandb/settings
+2025-06-07 22:04:15,924 INFO    MainThread:32324 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2025-06-07 22:04:15,925 INFO    MainThread:32324 [wandb_init.py:setup_run_log_directory():703] Logging user logs to /home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250607_220415-631ae1u7/logs/debug.log
+2025-06-07 22:04:15,926 INFO    MainThread:32324 [wandb_init.py:setup_run_log_directory():704] Logging internal logs to /home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250607_220415-631ae1u7/logs/debug-internal.log
+2025-06-07 22:04:15,927 INFO    MainThread:32324 [wandb_init.py:init():831] calling init triggers
+2025-06-07 22:04:15,928 INFO    MainThread:32324 [wandb_init.py:init():836] wandb.init called with sweep_config: {}
+config: {'train_pkl': '/home/ubuntu/hcy50662/output_mimic3/pheno/train_p2x_data.pkl', 'val_pkl': '/home/ubuntu/hcy50662/output_mimic3/pheno/val_p2x_data.pkl', 'test_pkl': '/home/ubuntu/hcy50662/output_mimic3/pheno/test_p2x_data.pkl', 'save_path': 'models/pheno_clinical_longformer', 'max_seq_len': 4096, 'batch_size': 8, 'num_epochs': 25, 'lr': 2e-05, 'weight_decay': 0.01, 'warmup_ratio': 0.1, 'grad_accum': 2, 'pretrained_meta_model': 'yikuan8/Clinical-Longformer', 'use_4bit': False, 'lora': None, 'model_type': 'clinicallongformer', 'task': 'pheno', 'num_labels': 25, 'wandb': True, 'mixed_precision': 'bf16', 'pooling': 'cls', '_wandb': {}}
+2025-06-07 22:04:15,929 INFO    MainThread:32324 [wandb_init.py:init():872] starting backend
+2025-06-07 22:04:16,135 INFO    MainThread:32324 [wandb_init.py:init():875] sending inform_init request
+2025-06-07 22:04:16,137 INFO    MainThread:32324 [wandb_init.py:init():883] backend started and connected
+2025-06-07 22:04:16,138 INFO    MainThread:32324 [wandb_init.py:init():956] updated telemetry
+2025-06-07 22:04:16,188 INFO    MainThread:32324 [wandb_init.py:init():980] communicating run to backend with 90.0 second timeout
+2025-06-07 22:04:16,464 INFO    MainThread:32324 [wandb_init.py:init():1032] starting run threads in backend
+2025-06-07 22:04:16,557 INFO    MainThread:32324 [wandb_run.py:_console_start():2453] atexit reg
+2025-06-07 22:04:16,557 INFO    MainThread:32324 [wandb_run.py:_redirect():2301] redirect: wrap_raw
+2025-06-07 22:04:16,558 INFO    MainThread:32324 [wandb_run.py:_redirect():2370] Wrapping output streams.
+2025-06-07 22:04:16,560 INFO    MainThread:32324 [wandb_run.py:_redirect():2393] Redirects installed.
+2025-06-07 22:04:16,561 INFO    MainThread:32324 [wandb_init.py:init():1078] run started, returning control to user process
+2025-06-07 22:04:44,567 INFO    MsgRouterThr:32324 [mailbox.py:close():129] [no run ID] Closing mailbox, abandoning 1 handles.

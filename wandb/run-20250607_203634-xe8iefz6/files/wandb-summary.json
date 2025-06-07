@@ -1,0 +1,1 @@
+{"val_macro_AUROC":0.598018327046744,"train_loss":0.369332879781723,"val_macro_F1":0,"step":11988,"_timestamp":1.7493349858088062e+09,"_runtime":6391.507757117,"val_micro_F1":0,"_step":11988,"val_macro_AUPRC":0.22743943613446632,"_wandb":{"runtime":6392}}

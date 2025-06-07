@@ -39,9 +39,15 @@ def collate_fn(tokenizer: PreTrainedTokenizer, max_length: int, model_type: str 
             "labels": labels_tensor,
         }
         if model_type == "clinicallongformer":
-            global_attention_mask = torch.zeros_like(attention_mask)
-            if global_attention_mask.ndim == 2:
-                global_attention_mask[:, 0] = 1
+            global_attention_mask = torch.zeros_like(attention_mask)           # (b, L)
+            seq_len = global_attention_mask.size(1)
+            idx = torch.arange(0, seq_len, 128, device=global_attention_mask.device)
+            # 仅在有效 token 上置 1
+            valid_idx = (attention_mask[:, idx] == 1).long()    
+            global_attention_mask[:, idx] = valid_idx
+
+            # 保底：始终给 CLS 位置全局注意力
+            global_attention_mask[:, 0] = 1
             batch_dict["global_attention_mask"] = global_attention_mask
         return batch_dict
 
