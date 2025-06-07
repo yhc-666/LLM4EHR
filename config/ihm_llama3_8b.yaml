@@ -12,11 +12,12 @@ weight_decay: 0.01
 warmup_ratio: 0.1
 grad_accum: 1
 pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct
-use_4bit: true
+use_4bit: false
 lora:
   r: 8
   lora_alpha: 32
   lora_dropout: 0.05
+model_type: llama
 task: ihm
 num_labels: 1
 wandb: true

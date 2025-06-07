@@ -16,8 +16,9 @@ LLM4EHR/
 ├── requirements.txt           # 依赖 (torch, transformers, accelerate …)
 │
 ├── config/                    # 每个 YAML = 一组实验超参
-│   ├── ihm.yaml               # 48 h IHM 二分类
-│   └── pheno.yaml             # 24 h Pheno 多标签
+│   ├── ihm_llama3_8b.yaml     # 48 h IHM 二分类
+│   ├── pheno_llama3_8b.yaml   # 24 h Pheno 多标签
+│   └── pheno_clinical_longformer.yaml
 │
 ├── sampledata/                # 测试数据（前30个数据点）
 │   ├── ihm/                   # 48h mortality prediction samples
@@ -86,3 +87,19 @@ During testing, you can set `DATA_ROOT` to `sampledata` to use these smaller dat
 | `text_time`   | `list[float]`       | ``length = len(text_data)``    | 文本对应的时间戳（小时）                                     | 文本事件发生时间               |
 | `label`       | `list[int]` / `int` | PHE: `(25,)`                   | 预测标签：25 类表型多标签（0/1 × 25）                        | 监督信号                       |
 | `name`        | `str`               | —                              | 样本文件名或唯一标识                                         | 便于追溯与调试                 |
+
+## Running Llama 3 8B
+To finetune the Llama 3 8B baseline on the sample phenotype data:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/pheno_llama3_8b.yaml
+python -m src.test --config config/pheno_llama3_8b.yaml
+```
+
+## Running Clinical-Longformer
+To finetune the Clinical-Longformer baseline on the sample phenotype data:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/pheno_clinical_longformer.yaml
+python -m src.test --config config/pheno_clinical_longformer.yaml
+```
