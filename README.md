@@ -19,6 +19,16 @@ LLM4EHR/
 │   ├── ihm.yaml               # 48 h IHM 二分类
 │   └── pheno.yaml             # 24 h Pheno 多标签
 │
+├── sampledata/                # 测试数据（前30个数据点）
+│   ├── ihm/                   # 48h mortality prediction samples
+│   │   ├── train_p2x_data.pkl
+│   │   ├── val_p2x_data.pkl
+│   │   └── test_p2x_data.pkl
+│   └── pheno/                 # 24h phenotype classification samples
+│       ├── train_p2x_data.pkl
+│       ├── val_p2x_data.pkl
+│       └── test_p2x_data.pkl
+│
 ├── src/
 │   ├── data/
 │   │   ├── loader.py          # 读 raw pkl ➜ torch Dataset
@@ -39,6 +49,13 @@ LLM4EHR/
 
 ## Dataset Format
 首先我在预处理后得到ihm/pheno 分别的下游prediction任务数据集，每个数据集被切分为train/val/test，以pkl格式存储于'DATAROOT'
+
+### Sample Data for Testing
+For convenient debugging by coding agents, we provide sample datasets containing the first 30 data points in the `sampledata/` directory:
+- `sampledata/ihm/`: Contains train/val/test splits for 48-hour mortality prediction task
+- `sampledata/pheno/`: Contains train/val/test splits for 24-hour phenotype classification task
+
+During testing, you can set `DATA_ROOT` to `sampledata` to use these smaller datasets for quick debugging and development.
 
 1. 48h ihm prediction：对应train_p2x_data.pkl, val_p2x_data.pkl, test_p2x_data.pkl
 
