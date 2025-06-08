@@ -7,10 +7,10 @@ save_path: models/pheno_clinical_longformer
 max_seq_len: 4096
 batch_size: 8
 num_epochs: 50
-lr: 1e-5
+lr: 8e-6
 weight_decay: 0.01
 warmup_ratio: 0.1
-grad_accum: 1
+grad_accum: 2
 pretrained_meta_model: yikuan8/Clinical-Longformer
 use_4bit: false
 lora:
@@ -22,7 +22,7 @@ lora:
     # bias: "none"
     # task_type: "SEQ_CLS"
 model_type: clinicallongformer
-pooling: mean # 'mean' or 'cls'
+pooling: cls # 'mean' or 'cls'
 task: pheno
 num_labels: 25
 wandb: true

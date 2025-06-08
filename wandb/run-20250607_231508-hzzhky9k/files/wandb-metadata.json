@@ -1,0 +1,45 @@
+{
+  "os": "Linux-6.8.0-1013-nvidia-64k-aarch64-with-glibc2.35",
+  "python": "CPython 3.10.12",
+  "startedAt": "2025-06-07T23:15:08.714088Z",
+  "args": [
+    "--config",
+    "config/pheno_clinical_longformer.yaml"
+  ],
+  "program": "-m src.train",
+  "git": {
+    "remote": "https://github.com/yhc-666/LLM4EHR.git",
+    "commit": "499eee7b8f12d4878095cf102fc424f903731721"
+  },
+  "email": "e1264829@u.nus.edu",
+  "root": "/home/ubuntu/hcy50662/LLM4EHR",
+  "host": "192-222-51-193",
+  "executable": "/usr/bin/python",
+  "cpu_count": 64,
+  "cpu_count_logical": 64,
+  "gpu": "NVIDIA GH200 480GB",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "4261618229248",
+      "used": "27649667072"
+    }
+  },
+  "memory": {
+    "total": "564442824704"
+  },
+  "cpu": {
+    "count": 64,
+    "countLogical": 64
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA GH200 480GB",
+      "memoryTotal": "102625181696",
+      "cudaCores": 16896,
+      "architecture": "Hopper",
+      "uuid": "GPU-8fc6ddb6-a6bc-8f61-6071-5a5ca0007606"
+    }
+  ],
+  "cudaVersion": "12.8"
+}

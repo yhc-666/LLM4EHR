@@ -1,0 +1,16 @@
+{"time":"2025-06-07T23:25:33.317816524Z","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"/home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250607_232533-skxwnvnz/logs/debug-core.log"}
+{"time":"2025-06-07T23:25:33.482155748Z","level":"INFO","msg":"stream: created new stream","id":"skxwnvnz"}
+{"time":"2025-06-07T23:25:33.482190756Z","level":"INFO","msg":"stream: started","id":"skxwnvnz"}
+{"time":"2025-06-07T23:25:33.482205893Z","level":"INFO","msg":"writer: Do: started","stream_id":"skxwnvnz"}
+{"time":"2025-06-07T23:25:33.482216165Z","level":"INFO","msg":"handler: started","stream_id":"skxwnvnz"}
+{"time":"2025-06-07T23:25:33.482228741Z","level":"INFO","msg":"sender: started","stream_id":"skxwnvnz"}
+{"time":"2025-06-07T23:25:33.620991533Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-08T00:09:48.85331439Z","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/graphql\": read tcp 172.26.134.214:41074->35.186.228.49:443: read: connection reset by peer"}
+{"time":"2025-06-08T07:41:16.564084615Z","level":"INFO","msg":"stream: closing","id":"skxwnvnz"}
+{"time":"2025-06-08T07:41:16.564112967Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-08T07:41:16.565115565Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-08T07:41:16.879859586Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-08T07:41:16.981168565Z","level":"INFO","msg":"handler: closed","stream_id":"skxwnvnz"}
+{"time":"2025-06-08T07:41:16.981195605Z","level":"INFO","msg":"sender: closed","stream_id":"skxwnvnz"}
+{"time":"2025-06-08T07:41:16.981190261Z","level":"INFO","msg":"writer: Close: closed","stream_id":"skxwnvnz"}
+{"time":"2025-06-08T07:41:16.984018437Z","level":"INFO","msg":"stream: closed","id":"skxwnvnz"}

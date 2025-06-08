@@ -1,0 +1,15 @@
+{"time":"2025-06-07T22:56:08.556834003Z","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"/home/ubuntu/hcy50662/LLM4EHR/wandb/run-20250607_225608-rjonfx5m/logs/debug-core.log"}
+{"time":"2025-06-07T22:56:08.713922406Z","level":"INFO","msg":"stream: created new stream","id":"rjonfx5m"}
+{"time":"2025-06-07T22:56:08.713957734Z","level":"INFO","msg":"stream: started","id":"rjonfx5m"}
+{"time":"2025-06-07T22:56:08.713968934Z","level":"INFO","msg":"writer: Do: started","stream_id":"rjonfx5m"}
+{"time":"2025-06-07T22:56:08.713978086Z","level":"INFO","msg":"handler: started","stream_id":"rjonfx5m"}
+{"time":"2025-06-07T22:56:08.71399543Z","level":"INFO","msg":"sender: started","stream_id":"rjonfx5m"}
+{"time":"2025-06-07T22:56:08.822019388Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-06-08T07:41:46.867501787Z","level":"INFO","msg":"stream: closing","id":"rjonfx5m"}
+{"time":"2025-06-08T07:41:46.867576956Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-06-08T07:41:46.868259519Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-06-08T07:41:47.142632404Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-06-08T07:41:47.456975079Z","level":"INFO","msg":"handler: closed","stream_id":"rjonfx5m"}
+{"time":"2025-06-08T07:41:47.457008743Z","level":"INFO","msg":"sender: closed","stream_id":"rjonfx5m"}
+{"time":"2025-06-08T07:41:47.457008039Z","level":"INFO","msg":"writer: Close: closed","stream_id":"rjonfx5m"}
+{"time":"2025-06-08T07:41:47.459740342Z","level":"INFO","msg":"stream: closed","id":"rjonfx5m"}
