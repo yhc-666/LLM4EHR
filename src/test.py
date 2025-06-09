@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-
+import numpy as np
 import torch
 from accelerate import Accelerator
 from torch.utils.data import DataLoader
@@ -65,8 +65,9 @@ def main(config_path: str) -> None:
             label = accelerator.gather(batch["labels"]).cpu().float().numpy()
             preds.append(logits)
             labels.append(label)
-    pred = torch.tensor(preds).reshape(-1, cfg.num_labels).numpy()
-    lab = torch.tensor(labels).reshape(-1, cfg.num_labels if cfg.num_labels > 1 else 1).numpy()
+    # 正确地连接不同大小的批次
+    pred = np.concatenate(preds, axis=0)
+    lab = np.concatenate(labels, axis=0)
     if cfg.task == "ihm":
         metrics = binary_metrics(pred, lab)
     else:

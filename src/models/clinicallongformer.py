@@ -76,7 +76,7 @@ class ClinicalLongformerPool(nn.Module):
         attention_mask: torch.Tensor,
         global_attention_mask: Optional[torch.Tensor] = None,
         labels: Optional[torch.Tensor] = None,
-        global_interval: int = 128,
+        global_interval: int = 64,
     ) -> LongformerOutputs:
         
         outputs = self.model(
