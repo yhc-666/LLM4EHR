@@ -4,8 +4,8 @@ import os
 import random
 import yaml
 import re
-from dataclasses import dataclass
-from typing import Any, Dict
+from dataclasses import dataclass, fields
+from typing import Any, Dict, Type
 
 import numpy as np
 import torch
@@ -26,8 +26,8 @@ def save_checkpoint(model: torch.nn.Module, path: str) -> None:
 
 
 @dataclass
-class Config:
-    """Dataclass wrapper for experiment configuration."""
+class BaseConfig:
+    """Dataclass wrapper for common experiment settings."""
 
     train_pkl: str
     val_pkl: str
@@ -48,10 +48,32 @@ class Config:
     num_labels: int
     wandb: bool
     mixed_precision: str = "no"  # 支持 "no", "fp16", "bf16"
+
+
+@dataclass
+class LlamaConfig(BaseConfig):
+    """Configuration for Llama models."""
+
+
+@dataclass
+class ClinicalLongformerConfig(BaseConfig):
+    """Configuration for Clinical-Longformer."""
+
     pooling: str = "mean"
 
 
-def parse_config_yaml(path: str) -> Config:
+@dataclass
+class TimeLLMConfig(BaseConfig):
+    """Configuration for TimeLLM models."""
+
+    d_model: int | None = None
+    patch_len: int = 8
+    stride: int = 8
+    n_heads: int = 8
+    freezebasemodel: bool = False
+
+
+def parse_config_yaml(path: str) -> BaseConfig:
     """Parse YAML config file and expand environment variables."""
     with open(path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -65,5 +87,14 @@ def parse_config_yaml(path: str) -> Config:
                 data[key] = float(value)
             except ValueError:
                 pass  # 如果转换失败，保持原值
-    return Config(**data)
+    model_type = data.get("model_type", "llama").lower()
+    cfg_map: Dict[str, Type[BaseConfig]] = {
+        "llama": LlamaConfig,
+        "clinicallongformer": ClinicalLongformerConfig,
+        "timellm": TimeLLMConfig,
+    }
+    cfg_cls = cfg_map.get(model_type, BaseConfig)
+    allowed = {f.name for f in fields(cfg_cls)}
+    filtered = {k: v for k, v in data.items() if k in allowed}
+    return cfg_cls(**filtered)
 

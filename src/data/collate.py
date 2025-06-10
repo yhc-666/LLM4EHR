@@ -38,6 +38,9 @@ def collate_fn(tokenizer: PreTrainedTokenizer, max_length: int, model_type: str 
             "attention_mask": attention_mask,
             "labels": labels_tensor,
         }
+        if model_type == "timellm":
+            ts = [torch.tensor(ex["reg_ts"], dtype=torch.float32) for ex in batch]
+            batch_dict["reg_ts"] = torch.stack(ts)
         if model_type == "clinicallongformer":
             global_attention_mask = torch.zeros_like(attention_mask)           # (b, L)
             seq_len = global_attention_mask.size(1)

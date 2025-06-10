@@ -8,10 +8,22 @@ from torch.utils.data import Dataset
 
 
 class MIMICDataset(Dataset):
-    """Dataset for MIMIC IHM/Pheno tasks."""
+    """Dataset for MIMIC IHM/Pheno tasks.
 
-    def __init__(self, pkl_path: str, task: str) -> None:
+    Parameters
+    ----------
+    pkl_path: str
+        Path to the pickle file containing the dataset.
+    task: str
+        Either ``"ihm"`` or ``"pheno"``.
+    model_type: str, default "llama"
+        Which model this dataset will feed. ``"timellm"`` additionally returns
+        the regularized time series.
+    """
+
+    def __init__(self, pkl_path: str, task: str, model_type: str = "llama") -> None:
         self.task = task.lower()
+        self.model_type = model_type.lower()
         with open(pkl_path, "rb") as f:
             self.data: List[Dict[str, Any]] = pickle.load(f)
 
@@ -28,7 +40,10 @@ class MIMICDataset(Dataset):
             label = int(item["label"])
         else:
             label = np.array(item["label"][1:], dtype=np.float32)
-        return {"text_list": texts_sorted, "label": label}
+        out = {"text_list": texts_sorted, "label": label}
+        if self.model_type == "timellm":
+            out["reg_ts"] = item["reg_ts"].astype(np.float32)
+        return out
 
 
 
