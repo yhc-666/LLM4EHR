@@ -9,6 +9,10 @@ from transformers import AutoModel, AutoTokenizer, PreTrainedTokenizerBase, Bits
 from peft import LoraConfig, get_peft_model
 
 
+# now the patches from different ts channels but same time step are concatenatd together
+# 然后传给TokenEmbedding通过2层MLP映射到LLM hiddendim
+
+
 @dataclass
 class TimeLLMOutputs:
     """Output of ``TimeLLM`` forward pass."""
@@ -31,11 +35,11 @@ class TokenEmbedding(nn.Module):
     def __init__(self, c_in: int | None, d_model: int) -> None:
         super().__init__()
         if c_in is None:
-            self.fc1 = nn.LazyLinear(d_model)
+            self.fc1 = nn.LazyLinear(2*d_model)
         else:
-            self.fc1 = nn.Linear(c_in, d_model)
+            self.fc1 = nn.Linear(c_in, 2*d_model)
         self.act = nn.ReLU()
-        self.fc2 = nn.Linear(d_model, d_model)
+        self.fc2 = nn.Linear(2*d_model, d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.act(self.fc1(x))
@@ -55,7 +59,9 @@ class ReplicationPad1d(nn.Module):
 
 
 class PatchEmbedding(nn.Module):
-    """Patchify multi-variate time series and embed each patch.
+    """
+    Patchify multi-variate time series and embed each patch.
+    Changed PatchEmbedding to combine all variables per patch
 
     Args:
         d_model: embedding dimension after convolution

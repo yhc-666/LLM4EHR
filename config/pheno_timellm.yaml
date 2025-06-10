@@ -4,14 +4,14 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 
 save_path: models/pheno_timellm
 
-max_seq_len: 500
+max_seq_len: 5000
 batch_size: 4
-num_epochs: 3
-lr: 1e-5
+num_epochs: 15
+lr: 2e-5
 weight_decay: 0.01
 warmup_ratio: 0.1
 grad_accum: 2
-pretrained_meta_model: hf-internal-testing/tiny-random-gpt2 # meta-llama/Meta-Llama-3-8B-Instruct
+pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct # hf-internal-testing/tiny-random-gpt2
 use_4bit: false
 lora:
   r: 16
