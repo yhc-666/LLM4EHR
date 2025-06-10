@@ -42,7 +42,7 @@ class MIMICDataset(Dataset):
             label = np.array(item["label"][1:], dtype=np.float32)
         out = {"text_list": texts_sorted, "label": label}
         if self.model_type == "timellm":
-            out["reg_ts"] = item["reg_ts"].astype(np.float32)
+            out["reg_ts"] = item["reg_ts"][:,:17].astype(np.float32)
         return out
 
 
@@ -50,10 +50,11 @@ class MIMICDataset(Dataset):
 if __name__ == "__main__":
     pkl_path = "/home/ubuntu/hcy50662/output_mimic3/pheno/test_p2x_data.pkl"  # 替换为实际的pkl文件路径
     task = "pheno"  # 或者 "pheno"，根据你的任务类型
+    model_type = "timellm"
     
     try:
         # 创建dataset实例
-        dataset = MIMICDataset(pkl_path, task)
+        dataset = MIMICDataset(pkl_path, task, model_type)
         print(f"数据集大小: {len(dataset)}")
         
         # 打印前几个样本
@@ -63,6 +64,8 @@ if __name__ == "__main__":
             print(f"文本数量: {len(sample['text_list'])}")
             print(f"标签: {sample['label']}")
             print(f"标签长度: {len(sample['label'])}")
+            print(f"reg_ts长度: {sample['reg_ts'].shape}")
+            print(f"reg_ts: {sample['reg_ts']}")
             print(f"标签类型: {type(sample['label'])}")
             if sample['text_list']:
                 print(f"第一段文本预览: {sample['text_list'][0][:100]}...")
@@ -70,5 +73,3 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"错误: 找不到文件 {pkl_path}")
         print("请确认pkl文件路径是否正确")
-    except Exception as e:
-        print(f"加载数据时出错: {e}")
