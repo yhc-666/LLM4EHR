@@ -103,3 +103,11 @@ export DATA_ROOT=sampledata
 python -m src.train --config config/pheno_clinical_longformer.yaml
 python -m src.test --config config/pheno_clinical_longformer.yaml
 ```
+
+## Running TimeLLM
+To finetune the TimeLLM baseline on the sample phenotype data:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/pheno_timellm.yaml
+python -m src.test --config config/pheno_timellm.yaml
+```

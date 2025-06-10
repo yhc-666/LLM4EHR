@@ -1,0 +1,31 @@
+train_pkl: ${DATA_ROOT}/pheno/train_p2x_data.pkl
+val_pkl: ${DATA_ROOT}/pheno/val_p2x_data.pkl
+test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
+
+save_path: models/pheno_timellm
+
+max_seq_len: 128
+batch_size: 4
+num_epochs: 3
+lr: 2e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+grad_accum: 2
+pretrained_meta_model: hf-internal-testing/tiny-random-gpt2
+use_4bit: false
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+# 模型结构参数
+d_model: 256
+patch_len: 8
+stride: 8
+n_heads: 8
+# 冻结基座 LLM
+freezebasemodel: false
+model_type: timellm
+task: pheno
+num_labels: 25
+wandb: false
+mixed_precision: "bf16"

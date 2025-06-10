@@ -18,12 +18,13 @@ from .data.loader import MIMICDataset
 from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
 from .models.clinicallongformer import ClinicalLongformerPool
+from .models.timellm import TimeLLM
 from .metrics import binary_metrics, multilabel_metrics
-from .utils import Config, parse_config_yaml, save_checkpoint, set_seed
+from .utils import BaseConfig, parse_config_yaml, save_checkpoint, set_seed
 
 
 def evaluate(
-    accelerator: Accelerator, model: nn.Module, dataloader: DataLoader, cfg: Config
+    accelerator: Accelerator, model: nn.Module, dataloader: DataLoader, cfg: BaseConfig
 ) -> Dict[str, float]:
     model.eval()
     preds, targets = [], []
@@ -76,12 +77,24 @@ def main(config_path: str) -> None:
             lora_cfg=cfg.lora,
             pooling=cfg.pooling,
         )
+    elif cfg.model_type == "timellm":
+        model = TimeLLM(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
+            d_model=cfg.d_model,
+            patch_len=cfg.patch_len,
+            stride=cfg.stride,
+            n_heads=cfg.n_heads,
+            freeze_base_model=cfg.freezebasemodel,
+        )
     else:
         raise ValueError("unknown model_type")
     tokenizer = model.tokenizer
 
-    train_ds = MIMICDataset(cfg.train_pkl, cfg.task)
-    val_ds = MIMICDataset(cfg.val_pkl, cfg.task)
+    train_ds = MIMICDataset(cfg.train_pkl, cfg.task, cfg.model_type)
+    val_ds = MIMICDataset(cfg.val_pkl, cfg.task, cfg.model_type)
 
     train_loader = DataLoader(
         train_ds,
@@ -96,7 +109,11 @@ def main(config_path: str) -> None:
         collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
     )
 
-    optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+    optimizer = AdamW(
+        filter(lambda p: p.requires_grad, model.parameters()),
+        lr=cfg.lr,
+        weight_decay=cfg.weight_decay,
+    )
     num_training_steps = len(train_loader) * cfg.num_epochs
     num_warmup = int(num_training_steps * cfg.warmup_ratio)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup, num_training_steps)

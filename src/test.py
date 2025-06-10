@@ -11,6 +11,7 @@ from .data.loader import MIMICDataset
 from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
 from .models.clinicallongformer import ClinicalLongformerPool
+from .models.timellm import TimeLLM
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import parse_config_yaml, set_seed
 
@@ -35,6 +36,18 @@ def main(config_path: str) -> None:
             lora_cfg=cfg.lora,
             pooling=cfg.pooling,
         )
+    elif cfg.model_type == "timellm":
+        model = TimeLLM(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
+            d_model=cfg.d_model,
+            patch_len=cfg.patch_len,
+            stride=cfg.stride,
+            n_heads=cfg.n_heads,
+            freeze_base_model=cfg.freezebasemodel,
+        )
     else:
         raise ValueError("unknown model_type")
     
@@ -46,7 +59,7 @@ def main(config_path: str) -> None:
         print(f"忽略 {len(unexpected)} 个 bitsandbytes 缓冲区")
     tokenizer = model.tokenizer
 
-    test_ds = MIMICDataset(cfg.test_pkl, cfg.task)
+    test_ds = MIMICDataset(cfg.test_pkl, cfg.task, cfg.model_type)
     test_loader = DataLoader(
         test_ds,
         batch_size=cfg.batch_size,
