@@ -16,9 +16,10 @@ LLM4EHR/
 ├── requirements.txt           # 依赖 (torch, transformers, accelerate …)
 │
 ├── config/                    # 每个 YAML = 一组实验超参
-│   ├── ihm_llama3_8b.yaml     # 48 h IHM 二分类
-│   ├── pheno_llama3_8b.yaml   # 24 h Pheno 多标签
-│   └── pheno_clinical_longformer.yaml
+│   ├── ihm_llama3_8b.yaml        # 48 h IHM 二分类
+│   ├── pheno_llama3_8b.yaml      # 24 h Pheno 多标签
+│   ├── pheno_clinical_longformer.yaml
+│   └── pheno_timellm.yaml        # TimeLLM 时序+文本
 │
 ├── sampledata/                # 测试数据（前30个数据点）
 │   ├── ihm/                   # 48h mortality prediction samples
@@ -36,7 +37,9 @@ LLM4EHR/
 │   │   └── collate.py         # tokenize→pad
 │   │
 │   ├── models/
-│   │   └── llama_mean.py      # Llama-3 8B + masked-mean pooling + 线性头 (+LoRA/4-bit)
+│   │   ├── llama_mean.py         # Llama-3 8B baseline
+│   │   ├── timellm.py            # TimeLLM 模型实现
+│   │   └── clinicallongformer.py # Clinical-Longformer baseline
 │   │
 │   ├── metrics.py             # AUPRC / AUROC / F1 / ACC 计算
 │   ├── train.py               # Accelerate 驱动的纯-PyTorch 训练循环

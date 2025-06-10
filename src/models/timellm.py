@@ -18,31 +18,28 @@ class TimeLLMOutputs:
 
 
 class TokenEmbedding(nn.Module):
-    """Simple convolution based token embedding used for patchified time series.
+    """Two-layer MLP token embedding used for patchified time series.
 
     Args:
-        c_in: number of channels in each patch (``patch_len``)
+        c_in: number of channels in each patch (``patch_len`` × ``num_vars``)
         d_model: embedding dimension of the patch tokens
 
     Input shape: ``(B, L, c_in)`` where ``L`` is number of patches.
     Output shape: ``(B, L, d_model)``.
     """
 
-    def __init__(self, c_in: int, d_model: int) -> None:
+    def __init__(self, c_in: int | None, d_model: int) -> None:
         super().__init__()
-        self.token_conv = nn.Conv1d(
-            in_channels=c_in,
-            out_channels=d_model,
-            kernel_size=3,
-            padding=1,
-            padding_mode="circular",
-            bias=False,
-        )
-        nn.init.kaiming_normal_(self.token_conv.weight, mode="fan_in", nonlinearity="leaky_relu")
+        if c_in is None:
+            self.fc1 = nn.LazyLinear(d_model)
+        else:
+            self.fc1 = nn.Linear(c_in, d_model)
+        self.act = nn.ReLU()
+        self.fc2 = nn.Linear(d_model, d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.token_conv(x.permute(0, 2, 1))  # (B, d_model, L)
-        return x.transpose(1, 2)  # (B, L, d_model)
+        x = self.act(self.fc1(x))
+        return self.fc2(x)
 
 
 class ReplicationPad1d(nn.Module):
@@ -67,7 +64,7 @@ class PatchEmbedding(nn.Module):
         dropout: dropout rate applied after embedding
 
     Input shape: ``(B, V, T)`` where ``V`` is number of variables.
-    Output shape: ``(B, V * L, d_model)`` where ``L`` is number of patches.
+    Output shape: ``(B, L, d_model)`` where ``L`` is number of patches.
     """
 
     def __init__(self, d_model: int, patch_len: int, stride: int, dropout: float) -> None:
@@ -75,17 +72,17 @@ class PatchEmbedding(nn.Module):
         self.patch_len = patch_len
         self.stride = stride
         self.pad = ReplicationPad1d((0, stride))
-        self.value_embedding = TokenEmbedding(patch_len, d_model)
+        # ``TokenEmbedding`` will lazily infer its input dimension during the first forward pass
+        self.value_embedding = TokenEmbedding(None, d_model)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, int]:
         B, V, T = x.size()
         x = self.pad(x)
-        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)
+        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)  # (B, V, L, patch_len)
         L = x.size(2)
-        x = x.reshape(B * V, L, self.patch_len)
+        x = x.permute(0, 2, 1, 3).reshape(B, L, V * self.patch_len)
         x = self.value_embedding(x)
-        x = x.reshape(B, V * L, -1)
         return self.dropout(x), V
 
 
