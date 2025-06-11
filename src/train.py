@@ -21,7 +21,7 @@ from .models.clinicallongformer import ClinicalLongformerPool
 from .models.timellm import TimeLLM
 from .models.gpt4mts import GPT4MTS
 from .metrics import binary_metrics, multilabel_metrics
-from .utils import BaseConfig, parse_config_yaml, save_checkpoint, set_seed
+from .utils import BaseConfig, parse_config_yaml, save_checkpoint, set_seed, to_device
 
 
 def evaluate(
@@ -36,7 +36,7 @@ def evaluate(
     )
     with torch.no_grad():
         for batch in loader:
-            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
+            batch = {k: to_device(v, accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
             logits = accelerator.gather(outputs.logits).cpu().float().numpy()
             labels = accelerator.gather(batch["labels"]).cpu().float().numpy()
@@ -119,7 +119,6 @@ def main(config_path: str) -> None:
             tokenizer,
             cfg.max_seq_len,
             cfg.model_type,
-            getattr(model, "text_encoder", None),
         ),
     )
     val_loader = DataLoader(
@@ -130,7 +129,6 @@ def main(config_path: str) -> None:
             tokenizer,
             cfg.max_seq_len,
             cfg.model_type,
-            getattr(model, "text_encoder", None),
         ),
     )
 
@@ -160,7 +158,7 @@ def main(config_path: str) -> None:
             desc=f"Epoch {epoch}",
         )
         for step, batch in enumerate(progress):
-            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
+            batch = {k: to_device(v, accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
             loss = outputs.loss
             accelerator.backward(loss)

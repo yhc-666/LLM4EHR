@@ -3,21 +3,19 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 import torch
-from transformers import PreTrainedTokenizer, PreTrainedModel
+from transformers import PreTrainedTokenizer
 
 
 def collate_fn(
     tokenizer: PreTrainedTokenizer,
     max_length: int,
     model_type: str = "llama",
-    text_encoder: PreTrainedModel | None = None,
 ):
     """Create a collate function for DataLoader."""
 
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         if model_type == "gpt4mts":
-            assert text_encoder is not None, "text_encoder is required for gpt4mts"
-            labels, ts, summaries = [], [], []
+            labels, ts, tokens = [], [], []
             for ex in batch:
                 labels.append(ex["label"])
                 ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
@@ -31,12 +29,10 @@ def collate_fn(
                     max_length=max_length,
                     return_tensors="pt",
                 )
-                with torch.no_grad():
-                    out = text_encoder(**enc)
-                summaries.append(out.last_hidden_state[:, 0, :])
+                tokens.append(enc)
             labels_tensor = torch.tensor(labels, dtype=torch.float32)
             return {
-                "summary_emb": summaries,
+                "summary_tokens": tokens,
                 "reg_ts": torch.stack(ts),
                 "labels": labels_tensor,
             }

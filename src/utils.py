@@ -25,6 +25,17 @@ def save_checkpoint(model: torch.nn.Module, path: str) -> None:
     torch.save(model.state_dict(), path)
 
 
+def to_device(obj: Any, device: torch.device):
+    """Recursively move tensors inside ``obj`` to ``device``."""
+    if torch.is_tensor(obj):
+        return obj.to(device)
+    if isinstance(obj, dict):
+        return {k: to_device(v, device) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [to_device(v, device) for v in obj]
+    return obj
+
+
 @dataclass
 class BaseConfig:
     """Dataclass wrapper for common experiment settings."""

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import torch
 from torch import nn
@@ -178,12 +178,13 @@ class GPT4MTS(nn.Module):
                     param.requires_grad = False
 
         self.in_layer = nn.Linear(patch_size, d_model)
-        self.prompt_layer = nn.Linear(d_model, d_model)
-        self.relu = nn.ReLU()
 
         # text encoder
         self.text_encoder = AutoModel.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
         self.tokenizer = AutoTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
+
+        self.prompt_layer = nn.Linear(self.text_encoder.config.hidden_size, d_model)
+        self.relu = nn.ReLU()
 
         if self.classifier_head_type == "linear":
             self.classifier_head = nn.LazyLinear(num_labels)
@@ -225,6 +226,18 @@ class GPT4MTS(nn.Module):
         summary = rearrange(summary, 'b m l -> b l m')
         return summary.to(device)
 
+    def encode_notes(
+        self, notes: List[Dict[str, torch.Tensor]], device: torch.device
+    ) -> List[torch.Tensor]:
+        """Encode a batch of notes with the text encoder."""
+        embeds = []
+        for enc in notes:
+            enc = {k: v.to(device) for k, v in enc.items()}
+            with torch.no_grad():
+                out = self.text_encoder(**enc)
+            embeds.append(out.last_hidden_state[:, 0, :])
+        return embeds
+
     def get_emb(self, x: torch.Tensor, tokens: torch.Tensor | None = None) -> torch.Tensor:
         if tokens is None:
             return self.gpt2(inputs_embeds=x).last_hidden_state
@@ -238,7 +251,7 @@ class GPT4MTS(nn.Module):
     def forward(
         self,
         reg_ts: torch.Tensor,
-        summary_emb: List[torch.Tensor],
+        summary_tokens: List[Dict[str, torch.Tensor]],
         labels: Optional[torch.Tensor] = None,
     ) -> GPT4MTSOutput:
         """Forward pass.
@@ -247,8 +260,8 @@ class GPT4MTS(nn.Module):
         ----------
         reg_ts: Tensor
             Regularized time series of shape ``(B, L, C)``.
-        summary_emb: List[Tensor]
-            List of note embeddings for each sample, each of shape ``(n_i, d_model)``.
+        summary_tokens: List[Dict[str, Tensor]]
+            Tokenized notes for each sample.
         labels: Optional tensor
             Target labels of shape ``(B,)`` or ``(B, num_labels)``.
         """
@@ -264,10 +277,10 @@ class GPT4MTS(nn.Module):
         x = self.get_patch(reg_ts)
         x = self.in_layer(x)
 
-        summary_tokens = self.patch_summary([e.to(device) for e in summary_emb])
-        summary_tokens = summary_tokens.repeat_interleave(C, dim=0)
-
-        h = self.get_emb(x, summary_tokens)
+        note_embeds = self.encode_notes(summary_tokens, device)
+        summary_prompt = self.patch_summary(note_embeds)
+        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)
+        h = self.get_emb(x, summary_prompt)
         h = h.reshape(B, C, self.patch_num, self.d_model)
         if self.classifier_head_type == "linear":
             logits = self.classifier_head(h.reshape(B, -1))
