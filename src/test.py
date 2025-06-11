@@ -14,7 +14,7 @@ from .models.clinicallongformer import ClinicalLongformerPool
 from .models.timellm import TimeLLM
 from .models.gpt4mts import GPT4MTS
 from .metrics import binary_metrics, multilabel_metrics
-from .utils import parse_config_yaml, set_seed
+from .utils import parse_config_yaml, set_seed, to_device
 
 
 def main(config_path: str) -> None:
@@ -83,7 +83,6 @@ def main(config_path: str) -> None:
             tokenizer,
             cfg.max_seq_len,
             cfg.model_type,
-            getattr(model, "text_encoder", None),
         ),
     )
 
@@ -92,7 +91,7 @@ def main(config_path: str) -> None:
     preds, labels = [], []
     with torch.no_grad():
         for batch in test_loader:
-            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
+            batch = {k: to_device(v, accelerator.device) for k, v in batch.items()}
             outputs = model(**batch)
             logits = accelerator.gather(outputs.logits).cpu().float().numpy()
             label = accelerator.gather(batch["labels"]).cpu().float().numpy()

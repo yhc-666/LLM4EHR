@@ -114,3 +114,11 @@ export DATA_ROOT=sampledata
 python -m src.train --config config/pheno_timellm.yaml
 python -m src.test --config config/pheno_timellm.yaml
 ```
+
+## Running GPT4MTS
+To train the GPT4MTS baseline on the provided toy dataset:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/ihm_gpt4mts.yaml
+python -m src.test --config config/ihm_gpt4mts.yaml
+```
