@@ -41,8 +41,8 @@ class MIMICDataset(Dataset):
         else:
             label = np.array(item["label"][1:], dtype=np.float32)
         out = {"text_list": texts_sorted, "label": label}
-        if self.model_type == "timellm":
-            out["reg_ts"] = item["reg_ts"][:,:17].astype(np.float32)
+        if self.model_type in {"timellm", "gpt4mts"}:
+            out["reg_ts"] = item["reg_ts"][:, :17].astype(np.float32)
         return out
 
 

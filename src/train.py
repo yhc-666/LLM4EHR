@@ -19,6 +19,7 @@ from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
 from .models.clinicallongformer import ClinicalLongformerPool
 from .models.timellm import TimeLLM
+from .models.gpt4mts import GPT4MTS
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import BaseConfig, parse_config_yaml, save_checkpoint, set_seed
 
@@ -35,7 +36,7 @@ def evaluate(
     )
     with torch.no_grad():
         for batch in loader:
-            batch = {k: v.to(accelerator.device) for k, v in batch.items()}
+            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
             outputs = model(**batch)
             logits = accelerator.gather(outputs.logits).cpu().float().numpy()
             labels = accelerator.gather(batch["labels"]).cpu().float().numpy()
@@ -89,6 +90,20 @@ def main(config_path: str) -> None:
             n_heads=cfg.n_heads,
             freeze_base_model=cfg.freezebasemodel,
         )
+    elif cfg.model_type == "gpt4mts":
+        model = GPT4MTS(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            seq_len=cfg.seq_len,
+            patch_size=cfg.patch_size,
+            stride=cfg.stride,
+            gpt_layers=cfg.gpt_layers,
+            d_model=cfg.d_model,
+            freeze=cfg.freeze,
+            pretrain=cfg.pretrain,
+            revin=cfg.revin,
+            classifier_head=cfg.classifier_head,
+        )
     else:
         raise ValueError("unknown model_type")
     tokenizer = model.tokenizer
@@ -100,13 +115,23 @@ def main(config_path: str) -> None:
         train_ds,
         batch_size=cfg.batch_size,
         shuffle=True,
-        collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
+        collate_fn=collate_fn(
+            tokenizer,
+            cfg.max_seq_len,
+            cfg.model_type,
+            getattr(model, "text_encoder", None),
+        ),
     )
     val_loader = DataLoader(
         val_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
-        collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
+        collate_fn=collate_fn(
+            tokenizer,
+            cfg.max_seq_len,
+            cfg.model_type,
+            getattr(model, "text_encoder", None),
+        ),
     )
 
     optimizer = AdamW(
@@ -135,7 +160,7 @@ def main(config_path: str) -> None:
             desc=f"Epoch {epoch}",
         )
         for step, batch in enumerate(progress):
-            batch = {k: v.to(accelerator.device) for k, v in batch.items()}
+            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
             outputs = model(**batch)
             loss = outputs.loss
             accelerator.backward(loss)

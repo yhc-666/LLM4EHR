@@ -1,4 +1,4 @@
-models/
+/models/
 wandb/
 __pycache__/
 src/**/__pycache__/

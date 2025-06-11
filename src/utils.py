@@ -73,6 +73,20 @@ class TimeLLMConfig(BaseConfig):
     freezebasemodel: bool = False
 
 
+@dataclass
+class GPT4MTSConfig(BaseConfig):
+    """Configuration for GPT4MTS models."""
+    seq_len: int = 24
+    patch_size: int = 8
+    stride: int = 4
+    gpt_layers: int = 6
+    d_model: int = 768
+    freeze: bool = False
+    pretrain: bool = True
+    revin: bool = False
+    classifier_head: str = "linear"
+
+
 def parse_config_yaml(path: str) -> BaseConfig:
     """Parse YAML config file and expand environment variables."""
     with open(path, "r", encoding="utf-8") as f:
@@ -92,6 +106,7 @@ def parse_config_yaml(path: str) -> BaseConfig:
         "llama": LlamaConfig,
         "clinicallongformer": ClinicalLongformerConfig,
         "timellm": TimeLLMConfig,
+        "gpt4mts": GPT4MTSConfig,
     }
     cfg_cls = cfg_map.get(model_type, BaseConfig)
     allowed = {f.name for f in fields(cfg_cls)}

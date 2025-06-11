@@ -12,6 +12,7 @@ from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
 from .models.clinicallongformer import ClinicalLongformerPool
 from .models.timellm import TimeLLM
+from .models.gpt4mts import GPT4MTS
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import parse_config_yaml, set_seed
 
@@ -48,6 +49,20 @@ def main(config_path: str) -> None:
             n_heads=cfg.n_heads,
             freeze_base_model=cfg.freezebasemodel,
         )
+    elif cfg.model_type == "gpt4mts":
+        model = GPT4MTS(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            seq_len=cfg.seq_len,
+            patch_size=cfg.patch_size,
+            stride=cfg.stride,
+            gpt_layers=cfg.gpt_layers,
+            d_model=cfg.d_model,
+            freeze=cfg.freeze,
+            pretrain=cfg.pretrain,
+            revin=cfg.revin,
+            classifier_head=cfg.classifier_head,
+        )
     else:
         raise ValueError("unknown model_type")
     
@@ -64,7 +79,12 @@ def main(config_path: str) -> None:
         test_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
-        collate_fn=collate_fn(tokenizer, cfg.max_seq_len, cfg.model_type),
+        collate_fn=collate_fn(
+            tokenizer,
+            cfg.max_seq_len,
+            cfg.model_type,
+            getattr(model, "text_encoder", None),
+        ),
     )
 
     model, test_loader = accelerator.prepare(model, test_loader)
@@ -72,7 +92,7 @@ def main(config_path: str) -> None:
     preds, labels = [], []
     with torch.no_grad():
         for batch in test_loader:
-            batch = {k: v.to(accelerator.device) for k, v in batch.items()}
+            batch = {k: (v.to(accelerator.device) if torch.is_tensor(v) else v) for k, v in batch.items()}
             outputs = model(**batch)
             logits = accelerator.gather(outputs.logits).cpu().float().numpy()
             label = accelerator.gather(batch["labels"]).cpu().float().numpy()
