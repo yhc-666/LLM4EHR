@@ -182,8 +182,8 @@ class GPT4MTS(nn.Module):
         self.relu = nn.ReLU()
 
         # text encoder
-        self.text_encoder = AutoModel.from_pretrained("hf-internal-testing/tiny-random-bert")
-        self.tokenizer = AutoTokenizer.from_pretrained("hf-internal-testing/tiny-random-bert")
+        self.text_encoder = AutoModel.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
+        self.tokenizer = AutoTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
 
         if self.classifier_head_type == "linear":
             self.classifier_head = nn.LazyLinear(num_labels)
