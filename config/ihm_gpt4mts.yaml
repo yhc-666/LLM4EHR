@@ -1,0 +1,32 @@
+train_pkl: ${DATA_ROOT}/ihm/train_p2x_data.pkl
+val_pkl: ${DATA_ROOT}/ihm/val_p2x_data.pkl
+test_pkl: ${DATA_ROOT}/ihm/test_p2x_data.pkl
+
+save_path: models/ihm_gpt4mts
+
+max_seq_len: 128
+batch_size: 2
+num_epochs: 3
+lr: 2e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+grad_accum: 1
+pretrained_meta_model: hf-internal-testing/tiny-random-gpt2
+use_4bit: false
+lora: null
+
+seq_len: 48
+patch_size: 8
+stride: 4
+gpt_layers: 6
+d_model: 32
+freeze: false
+pretrain: true
+revin: false
+classifier_head: linear
+
+model_type: gpt4mts
+task: ihm
+num_labels: 1
+wandb: false
+mixed_precision: "no"
