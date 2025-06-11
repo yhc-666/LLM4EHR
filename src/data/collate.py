@@ -4,12 +4,13 @@ from typing import Any, Dict, List
 
 import torch
 from transformers import PreTrainedTokenizer
+import numpy as np
 
 
 def collate_fn(
     tokenizer: PreTrainedTokenizer,
     max_length: int,
-    model_type: str = "llama",
+    model_type: str = "llama", # llama, gpt4mts, timellm, clinicallongformer
 ):
     """Create a collate function for DataLoader."""
 
@@ -30,7 +31,9 @@ def collate_fn(
                     return_tensors="pt",
                 )
                 tokens.append(enc)
-            labels_tensor = torch.tensor(labels, dtype=torch.float32)
+            # 优化：先转换为numpy数组再创建tensor
+            labels_array = np.array(labels, dtype=np.float32)
+            labels_tensor = torch.from_numpy(labels_array)
             return {
                 "summary_tokens": tokens,
                 "reg_ts": torch.stack(ts),
@@ -57,9 +60,13 @@ def collate_fn(
         input_ids = enc["input_ids"]
         attention_mask = enc["attention_mask"]
         if isinstance(labels[0], (list, tuple, torch.Tensor)):
-            labels_tensor = torch.tensor(labels, dtype=torch.float32)
+            # 优化：先转换为numpy数组再创建tensor
+            labels_array = np.array(labels, dtype=np.float32)
+            labels_tensor = torch.from_numpy(labels_array)
         else:
-            labels_tensor = torch.tensor(labels, dtype=torch.float32)
+            # 优化：先转换为numpy数组再创建tensor
+            labels_array = np.array(labels, dtype=np.float32)
+            labels_tensor = torch.from_numpy(labels_array)
         batch_dict = {
             "input_ids": input_ids,
             "attention_mask": attention_mask,

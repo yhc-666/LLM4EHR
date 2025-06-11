@@ -245,7 +245,7 @@ class GPT4MTS(nn.Module):
         prompt_x = self.relu(self.prompt_layer(tokens))
         x_all = torch.cat([prompt_x, x], dim=1)
         out = self.gpt2(inputs_embeds=x_all).last_hidden_state
-        return out[:, -b:, :]
+        return out[:, :, :]
 
 
     def forward(
@@ -274,18 +274,27 @@ class GPT4MTS(nn.Module):
             std = torch.sqrt(reg_ts.var(1, keepdim=True, unbiased=False) + 1e-5).detach()
             reg_ts = (reg_ts - mean) / std
 
-        x = self.get_patch(reg_ts)
-        x = self.in_layer(x)
+        x = self.get_patch(reg_ts)  # Shape: (B*C, patch_num, patch_size)
+        x = self.in_layer(x)  # Shape: (B*C, patch_num, d_model)
 
         note_embeds = self.encode_notes(summary_tokens, device)
-        summary_prompt = self.patch_summary(note_embeds)
-        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)
-        h = self.get_emb(x, summary_prompt)
-        h = h.reshape(B, C, self.patch_num, self.d_model)
+        summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_model)
+        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_model)
+        
+        h = self.get_emb(x, summary_prompt)  # Shape: (B*C, prompt_len + patch_num, d_model)
+        
+        prompt_len = summary_prompt.size(1)
+        # 从GPT输出中只取时间序列部分（跳过prompt部分）
+        #h_ts = h[:, prompt_len:, :]  # Shape: (B*C, patch_num, d_model)
+        # 使用所有输出
+        h_ts = h
+        #h_ts = h_ts.reshape(B, C, self.patch_num, self.d_model)
+        h_ts = h_ts.reshape(B, C, self.patch_num + prompt_len, self.d_model)
+        
         if self.classifier_head_type == "linear":
-            logits = self.classifier_head(h.reshape(B, -1))
+            logits = self.classifier_head(h_ts.reshape(B, -1))
         else:
-            logits = self.classifier_head(h)
+            logits = self.classifier_head(h_ts)
 
         if self.revin:
             pass  # outputs are classification logits, no denorm needed

@@ -16,7 +16,7 @@ class MIMICDataset(Dataset):
         Path to the pickle file containing the dataset.
     task: str
         Either ``"ihm"`` or ``"pheno"``.
-    model_type: str, default "llama"
+    model_type: str, "llama", "gpt4mts", "timellm", "clinicallongformer"
         Which model this dataset will feed. ``"timellm"`` additionally returns
         the regularized time series.
     """

@@ -7,7 +7,7 @@ save_path: models/pheno_gpt4mts
 max_seq_len: 128
 batch_size: 2
 num_epochs: 100
-lr: 0.001
+lr: 0.0001
 weight_decay: 0.001
 warmup_ratio: 0.1
 grad_accum: 1
@@ -19,7 +19,7 @@ seq_len: 24
 patch_size: 4
 stride: 2
 gpt_layers: 6
-d_model: 768
+d_model: 1024 # hidden dim of LLM
 freeze: true
 pretrain: true
 revin: false
