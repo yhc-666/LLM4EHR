@@ -138,6 +138,10 @@ class GPT4MTS(nn.Module):
         Apply reversible instance normalization on the input time series.
     """
 
+    # NOTE: 
+    # "patch_num" is the number of patches produced from the time series
+    # "prompt_len" is the number of patches produced from the text notes
+
     def __init__(
         self,
         gpt_model: str,
@@ -177,17 +181,27 @@ class GPT4MTS(nn.Module):
                 else:
                     param.requires_grad = False
 
+        # TS 输入映射层：将TS patch_size维度映射到GPT-2的d_model维度
+        # Shape: (batch_size * channel, patch_num, patch_size) -> (batch_size * channel, patch_num, d_model)
         self.in_layer = nn.Linear(patch_size, d_model)
 
         # text encoder
         self.text_encoder = AutoModel.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
         self.tokenizer = AutoTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
 
+        # Prompt处理层：将文本embedding d_bert映射到GPT-2的d_model维度
+        # Shape: (batch_size, prompt_len, d_bert) -> (batch_size, prompt_len, d_model)
         self.prompt_layer = nn.Linear(self.text_encoder.config.hidden_size, d_model)
         self.relu = nn.ReLU()
 
         if self.classifier_head_type == "linear":
-            self.classifier_head = nn.LazyLinear(num_labels)
+            # 两层MLP分类器头部
+            self.classifier_head = nn.Sequential(
+                nn.LazyLinear(512),  # 第一层：输入维度自动推断 -> 512隐藏单元
+                nn.ReLU(),           # 激活函数
+                nn.Dropout(0.1),     # Dropout正则化
+                nn.Linear(512, num_labels)  # 第二层：512 -> 输出类别数
+            )
         elif self.classifier_head_type == "hier":
             self.classifier_head = HierAggregationHead(d_model, num_labels)
         else:
@@ -219,17 +233,18 @@ class GPT4MTS(nn.Module):
             extra = self.patch_size - padded.size(1)
             last = padded[:, -1:, :].repeat(1, extra, 1)
             padded = torch.cat([padded, last], dim=1)
-        summary = rearrange(padded, 'b l m -> b m l')
-        summary = self.padding_patch_layer(summary)
-        summary = summary.unfold(dimension=-1, size=self.patch_size, step=self.stride)
-        summary = summary.mean(dim=-1)
-        summary = rearrange(summary, 'b m l -> b l m')
-        return summary.to(device)
+        summary = rearrange(padded, 'b l m -> b m l') # (batch_size, notes_seq_len, d_bert) -> (batch_size, d_bert, notes_seq_len)
+        summary = self.padding_patch_layer(summary) # (batch_size, d_bert, notes_seq_len) -> (batch_size, d_bert, notes_seq_len + padding_size)
+        summary = summary.unfold(dimension=-1, size=self.patch_size, step=self.stride) # (batch_size, d_bert, notes_seq_len + padding_size) -> (batch_size, d_bert, prompt_len, patch_size)
+        summary = summary.mean(dim=-1) # (batch_size, d_bert, prompt_len)
+        summary = rearrange(summary, 'b m l -> b l m') # (batch_size, d_bert, prompt_len) -> (batch_size, prompt_len, d_bert)
+        # NOTE: prompt_len is the number of patches produced from the text notes
+        return padded.to(device)
 
     def encode_notes(
         self, notes: List[Dict[str, torch.Tensor]], device: torch.device
     ) -> List[torch.Tensor]:
-        """Encode a batch of notes with the text encoder."""
+        """Encode a batch of notes with the text encoder(BERT)."""
         embeds = []
         for enc in notes:
             enc = {k: v.to(device) for k, v in enc.items()}
@@ -239,6 +254,17 @@ class GPT4MTS(nn.Module):
         return embeds
 
     def get_emb(self, x: torch.Tensor, tokens: torch.Tensor | None = None) -> torch.Tensor:
+        """
+        通过GPT-2获取embedding表示
+        Args:
+            x: 输入的patch embedding
+               Shape: (batch_size * channel, patch_num, d_model)
+            tokens: 文本prompt的embedding
+                   Shape: (batch_size, prompt_len, d_bert)
+        Returns:
+            GPT-2的最后一层隐藏状态
+            Shape: (batch_size * channel, patch_num + prompt_len, d_model)
+        """
         if tokens is None:
             return self.gpt2(inputs_embeds=x).last_hidden_state
         a, b, _ = x.shape
@@ -277,9 +303,9 @@ class GPT4MTS(nn.Module):
         x = self.get_patch(reg_ts)  # Shape: (B*C, patch_num, patch_size)
         x = self.in_layer(x)  # Shape: (B*C, patch_num, d_model)
 
-        note_embeds = self.encode_notes(summary_tokens, device)
-        summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_model)
-        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_model)
+        note_embeds = self.encode_notes(summary_tokens, device) # Shape: (B, d_bert)
+        summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_bert)
+        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_bert)
         
         h = self.get_emb(x, summary_prompt)  # Shape: (B*C, prompt_len + patch_num, d_model)
         
