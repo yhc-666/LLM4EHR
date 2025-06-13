@@ -17,7 +17,7 @@ class MIMICDataset(Dataset):
     cfg: :class:`~src.utils.BaseConfig`
         Experiment configuration object. Should contain ``<split>_pkl`` paths,
         ``task`` and ``model_type`` fields.
-    split: str, optional
+        split: str, optional
         Dataset split to load. Can be ``"train"``, ``"val"`` or ``"test"``.
         Defaults to ``"train"``.
     """
@@ -48,6 +48,8 @@ class MIMICDataset(Dataset):
         out = {"text_list": texts_sorted, "label": label}
         if self.model_type in {"timellm", "gpt4mts"}:
             out["reg_ts"] = item["reg_ts"][:, :17].astype(np.float32)
+        elif self.model_type == "clinicalbigbird":
+            pass  # same as text-only models
         return out
 
 

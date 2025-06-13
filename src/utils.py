@@ -74,6 +74,12 @@ class ClinicalLongformerConfig(BaseConfig):
 
 
 @dataclass
+class ClinicalBigBirdConfig(BaseConfig):
+    """Configuration for Clinical-BigBird."""
+
+    pooling: str = "mean"
+
+@dataclass
 class TimeLLMConfig(BaseConfig):
     """Configuration for TimeLLM models."""
 
@@ -116,6 +122,7 @@ def parse_config_yaml(path: str) -> BaseConfig:
     cfg_map: Dict[str, Type[BaseConfig]] = {
         "llama": LlamaConfig,
         "clinicallongformer": ClinicalLongformerConfig,
+        "clinicalbigbird": ClinicalBigBirdConfig,
         "timellm": TimeLLMConfig,
         "gpt4mts": GPT4MTSConfig,
     }
