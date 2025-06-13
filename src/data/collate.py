@@ -10,7 +10,7 @@ import numpy as np
 def collate_fn(
     tokenizer: PreTrainedTokenizer,
     max_length: int,
-    model_type: str = "llama", # llama, gpt4mts, timellm, clinicallongformer
+    model_type: str = "llama", # llama, gpt4mts, timellm, clinicallongformer, clinicalbigbird
 ):
     """Create a collate function for DataLoader."""
 
@@ -86,6 +86,8 @@ def collate_fn(
             # 保底：始终给 CLS 位置全局注意力
             global_attention_mask[:, 0] = 1
             batch_dict["global_attention_mask"] = global_attention_mask
+        if model_type == "clinicalbigbird":
+            pass  # identical to Llama behavior
         return batch_dict
 
     return _fn

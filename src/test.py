@@ -11,6 +11,7 @@ from .data.loader import MIMICDataset
 from .data.collate import collate_fn
 from .models.llama_mean import LlamaMeanPool
 from .models.clinicallongformer import ClinicalLongformerPool
+from .models.clinicalbigbird import ClinicalBigBirdPool
 from .models.timellm import TimeLLM
 from .models.gpt4mts import GPT4MTS
 from .metrics import binary_metrics, multilabel_metrics
@@ -31,6 +32,14 @@ def main(config_path: str) -> None:
         )
     elif cfg.model_type == "clinicallongformer":
         model = ClinicalLongformerPool(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
+            pooling=cfg.pooling,
+        )
+    elif cfg.model_type == "clinicalbigbird":
+        model = ClinicalBigBirdPool(
             cfg.pretrained_meta_model,
             cfg.num_labels,
             use_4bit=cfg.use_4bit,

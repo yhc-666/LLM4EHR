@@ -111,6 +111,14 @@ python -m src.train --config config/pheno_clinical_longformer.yaml
 python -m src.test --config config/pheno_clinical_longformer.yaml
 ```
 
+## Running Clinical-Bigbird
+To finetune the Clinical-Bigbird baseline on the sample phenotype data:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/pheno_clinical_bigbird.yaml
+python -m src.test --config config/pheno_clinical_bigbird.yaml
+```
+
 ## Running TimeLLM
 To finetune the TimeLLM baseline on the sample phenotype data:
 ```bash
