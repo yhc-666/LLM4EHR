@@ -9,8 +9,8 @@ LLM4EHR is a minimal-yet-extensible PyTorch codebase for benchmarking long-conte
 ## Project Stucture
 ```
 LLM4EHR/
-├── README.md                  # 项目说明 + 快速上手
-├── requirements.txt           # 依赖 (torch, transformers, accelerate …)
+├── README.md                  
+├── requirements.txt           
 │
 ├── config/                    # 每个 YAML = 一组实验超参
 │   ├── ihm_llama3_8b.yaml        # 48 h IHM 二分类
