@@ -4,20 +4,20 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 
 save_path: models/pheno_clinical_bigbird
 
-max_seq_len: 256
+max_seq_len: 4096
 batch_size: 8
-num_epochs: 1
-lr: 8e-6
+num_epochs: 50
+lr: 2e-5
 weight_decay: 0.01
 warmup_ratio: 0.1
 grad_accum: 2
-pretrained_meta_model: hf-internal-testing/tiny-random-BigBirdForSequenceClassification
+pretrained_meta_model: yikuan8/Clinical-BigBird
 use_4bit: false
 lora:
     null
 model_type: clinicalbigbird
-pooling: cls
+pooling: mean
 task: pheno
 num_labels: 25
-wandb: false
+wandb: true
 mixed_precision: "bf16"

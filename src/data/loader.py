@@ -20,6 +20,15 @@ class MIMICDataset(Dataset):
         split: str, optional
         Dataset split to load. Can be ``"train"``, ``"val"`` or ``"test"``.
         Defaults to ``"train"``.
+    Possible model types:
+        - llama
+        - timellm
+        - gpt4mts
+        - clinicalbigbird
+        - clinicalbert
+    Possible tasks:
+        - ihm
+        - pheno
     """
 
     def __init__(self, cfg: BaseConfig, split: str = "train") -> None:
