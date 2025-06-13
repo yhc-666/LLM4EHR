@@ -74,7 +74,7 @@ def main(config_path: str) -> None:
         print(f"忽略 {len(unexpected)} 个 bitsandbytes 缓冲区")
     tokenizer = model.tokenizer
 
-    test_ds = MIMICDataset(cfg.test_pkl, cfg.task, cfg.model_type)
+    test_ds = MIMICDataset(cfg, split="test")
     test_loader = DataLoader(
         test_ds,
         batch_size=cfg.batch_size,
