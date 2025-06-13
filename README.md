@@ -1,13 +1,10 @@
 # LLM4EHR
-LLM4EHR is a minimal-yet-extensible PyTorch codebase for benchmarking long-context LLMs on two classic ICU prediction tasks using the MIMIC-III / IV datasets:
+LLM4EHR is a minimal-yet-extensible PyTorch codebase for benchmarking long-context LLMs and existing TS+TEXT+LLM models on two classic ICU prediction tasks using the MIMIC-III / IV datasets:
 
 | Task                                         | Horizon & Labels | Input Modalities (used today)                |
 | -------------------------------------------- | ---------------- | -------------------------------------------- |
 | **48-hour In-Hospital Mortality (IHM)**      | binary (0 / 1)   | *N clinical notes* per stay (≈ 4000 tokens) |
 | **24-hour Phenotype Classification (Pheno)** | 25× multi-label  | *N clinical notes* per stay                  |
-
-
-The current baseline feeds all notes into Meta-Llama-3-8B (optionally 4-bit + LoRA) and aggregates its final hidden states with masked mean pooling → linear head.
 
 ## Project Stucture
 ```
@@ -40,14 +37,14 @@ LLM4EHR/
 │   │
 │   ├── models/
 │   │   ├── llama_mean.py         # Llama-3 8B baseline
-│   │   ├── timellm.py            # TimeLLM 模型实现
+│   │   ├── timellm.py            # TimeLLM baseline
 │   │   ├── clinicallongformer.py # Clinical-Longformer baseline
-│   │   └── gpt4mts.py            # GPT4MTS 模型实现
+│   │   └── gpt4mts.py            # GPT4MTS baseline
 │   │
 │   ├── metrics.py             # AUPRC / AUROC / F1 / ACC 计算
-│   ├── train.py               # Accelerate 驱动的纯-PyTorch 训练循环
+│   ├── train.py               # 训练循环
 │   ├── test.py                # 推理 + 调用 metrics 评估
-│   └── utils.py               # set_seed, save_checkpoint, YAML 解析等工具函数
+│   └── utils.py               # set_seed, save_checkpoint, YAML parsing等工具函数
 │
 └── scripts/
     ├── run_ihm.sh             # 运行脚本
