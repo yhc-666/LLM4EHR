@@ -3,6 +3,8 @@ from __future__ import annotations
 import pickle
 from typing import Any, Dict, List
 
+from ..utils import BaseConfig
+
 import numpy as np
 from torch.utils.data import Dataset
 
@@ -12,18 +14,21 @@ class MIMICDataset(Dataset):
 
     Parameters
     ----------
-    pkl_path: str
-        Path to the pickle file containing the dataset.
-    task: str
-        Either ``"ihm"`` or ``"pheno"``.
-    model_type: str, "llama", "gpt4mts", "timellm", "clinicallongformer"
-        Which model this dataset will feed. ``"timellm"`` additionally returns
-        the regularized time series.
+    cfg: :class:`~src.utils.BaseConfig`
+        Experiment configuration object. Should contain ``<split>_pkl`` paths,
+        ``task`` and ``model_type`` fields.
+    split: str, optional
+        Dataset split to load. Can be ``"train"``, ``"val"`` or ``"test"``.
+        Defaults to ``"train"``.
     """
 
-    def __init__(self, pkl_path: str, task: str, model_type: str = "llama") -> None:
-        self.task = task.lower()
-        self.model_type = model_type.lower()
+    def __init__(self, cfg: BaseConfig, split: str = "train") -> None:
+        self.cfg = cfg
+        self.task = cfg.task.lower()
+        self.model_type = cfg.model_type.lower()
+
+        path_attr = f"{split}_pkl"
+        pkl_path = getattr(cfg, path_attr)
         with open(pkl_path, "rb") as f:
             self.data: List[Dict[str, Any]] = pickle.load(f)
 
@@ -48,13 +53,14 @@ class MIMICDataset(Dataset):
 
 
 if __name__ == "__main__":
-    pkl_path = "/home/ubuntu/hcy50662/output_mimic3/pheno/test_p2x_data.pkl"  # 替换为实际的pkl文件路径
-    task = "pheno"  # 或者 "pheno"，根据你的任务类型
-    model_type = "timellm"
-    
+    from pathlib import Path
+    from ..utils import parse_config_yaml
+
+    config_path = Path(__file__).resolve().parents[2] / "config/pheno_timellm.yaml"
+    cfg = parse_config_yaml(str(config_path))
+
     try:
-        # 创建dataset实例
-        dataset = MIMICDataset(pkl_path, task, model_type)
+        dataset = MIMICDataset(cfg, split="test")
         print(f"数据集大小: {len(dataset)}")
         
         # 打印前几个样本
@@ -70,6 +76,6 @@ if __name__ == "__main__":
             if sample['text_list']:
                 print(f"第一段文本预览: {sample['text_list'][0][:100]}...")
                 
-    except FileNotFoundError:
-        print(f"错误: 找不到文件 {pkl_path}")
+    except FileNotFoundError as e:
+        print(f"错误: 找不到文件 {e.filename}")
         print("请确认pkl文件路径是否正确")

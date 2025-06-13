@@ -108,8 +108,8 @@ def main(config_path: str) -> None:
         raise ValueError("unknown model_type")
     tokenizer = model.tokenizer
 
-    train_ds = MIMICDataset(cfg.train_pkl, cfg.task, cfg.model_type)
-    val_ds = MIMICDataset(cfg.val_pkl, cfg.task, cfg.model_type)
+    train_ds = MIMICDataset(cfg, split="train")
+    val_ds = MIMICDataset(cfg, split="val")
 
     train_loader = DataLoader(
         train_ds,
