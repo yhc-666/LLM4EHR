@@ -4,15 +4,32 @@ from typing import Any, Dict, List
 
 import torch
 from transformers import PreTrainedTokenizer
+
+from ..utils import BaseConfig
 import numpy as np
 
 
 def collate_fn(
     tokenizer: PreTrainedTokenizer,
-    max_length: int,
-    model_type: str = "llama", # llama, gpt4mts, timellm, clinicallongformer, clinicalbigbird
+    cfg: BaseConfig,
 ):
-    """Create a collate function for DataLoader."""
+    """Create a collate function for DataLoader.
+
+    Parameters
+    ----------
+    tokenizer : :class:`~transformers.PreTrainedTokenizer`
+        Tokenizer used to encode text.
+    cfg : :class:`~src.utils.BaseConfig`
+        Experiment configuration. Must contain ``max_seq_len`` and ``model_type`` fields.
+    """
+
+    max_length = cfg.max_seq_len
+    model_type = cfg.model_type.lower()
+
+    # Some smaller test tokenizers may not define a pad token. ``padding``
+    # will fail in that case, so fall back to using the EOS token.
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         if model_type == "gpt4mts":

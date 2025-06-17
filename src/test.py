@@ -88,11 +88,7 @@ def main(config_path: str) -> None:
         test_ds,
         batch_size=cfg.batch_size,
         shuffle=False,
-        collate_fn=collate_fn(
-            tokenizer,
-            cfg.max_seq_len,
-            cfg.model_type,
-        ),
+        collate_fn=collate_fn(tokenizer, cfg),
     )
 
     model, test_loader = accelerator.prepare(model, test_loader)
