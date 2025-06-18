@@ -3,25 +3,25 @@ val_pkl: ${DATA_ROOT}/pheno/val_p2x_data.pkl
 test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 
 save_path: models/pheno_belt
-
-max_seq_len: 512
+max_seq_len: null # not used in BELT
 
 batch_size: 2
-num_epochs: 1
-lr: 3e-5
+num_epochs: 50
+lr: 2e-5
 weight_decay: 0.01
 warmup_ratio: 0.1
 grad_accum: 1
-pretrained_meta_model: hf-internal-testing/tiny-random-bert
+pretrained_meta_model: emilyalsentzer/Bio_ClinicalBERT
 use_4bit: false
 lora: null
 model_type: belt
-chunk_size: 256
-stride: 128
-minimal_chunk_length: 20
+chunk_size: 510
+stride: 170
+minimal_chunk_length: 170
 pooling_strategy: mean
-maximal_text_length: null
+maximal_text_length: 6000 # max length of all concated notes (will be passed to tokenizer as max_length)
+# In BELT all notes are concatenated and passed to tokenizer as a single text to get token ids, then split into chunks
 task: pheno
 num_labels: 25
-wandb: false
+wandb: true
 mixed_precision: "no"

@@ -38,7 +38,7 @@ def collate_fn(
             for ex in batch:
                 labels.append(ex["label"])
                 ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
-                notes = ex["text_list"][-5:]
+                notes = ex["text_list"][:5]
                 if not notes:
                     notes = [" "]
                 enc = tokenizer(
@@ -60,7 +60,7 @@ def collate_fn(
         if model_type == "belt":
             docs, labels = [], []
             for ex in batch:
-                notes = ex["text_list"][:5]
+                notes = ex["text_list"][-5:]
                 joined = "\n".join(
                     [f"### NOTE {i+1} ###\n{note}" for i, note in enumerate(notes)]
                 )
