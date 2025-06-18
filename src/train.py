@@ -21,6 +21,7 @@ from .models.clinicallongformer import ClinicalLongformerPool
 from .models.clinicalbigbird import ClinicalBigBirdPool
 from .models.timellm import TimeLLM
 from .models.gpt4mts import GPT4MTS
+from .models.belt import BeltForLongTexts
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import BaseConfig, parse_config_yaml, save_checkpoint, set_seed, to_device
 
@@ -112,6 +113,18 @@ def main(config_path: str) -> None:
             pretrain=cfg.pretrain,
             revin=cfg.revin,
             classifier_head=cfg.classifier_head,
+        )
+    elif cfg.model_type == "belt":
+        model = BeltForLongTexts(
+            cfg.pretrained_meta_model,
+            cfg.num_labels,
+            chunk_size=cfg.chunk_size,
+            stride=cfg.stride,
+            minimal_chunk_length=cfg.minimal_chunk_length,
+            pooling_strategy=cfg.pooling_strategy,
+            maximal_text_length=cfg.maximal_text_length,
+            use_4bit=cfg.use_4bit,
+            lora_cfg=cfg.lora,
         )
     else:
         raise ValueError("unknown model_type")

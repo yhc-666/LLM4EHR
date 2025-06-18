@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 import torch
 from transformers import PreTrainedTokenizer
+from ..models.belt import transform_list_of_texts
 
 from ..utils import BaseConfig
 import numpy as np
@@ -54,6 +55,30 @@ def collate_fn(
             return {
                 "summary_tokens": tokens,
                 "reg_ts": torch.stack(ts),
+                "labels": labels_tensor,
+            }
+        if model_type == "belt":
+            docs, labels = [], []
+            for ex in batch:
+                notes = ex["text_list"][:5]
+                joined = "\n".join(
+                    [f"### NOTE {i+1} ###\n{note}" for i, note in enumerate(notes)]
+                )
+                docs.append(joined)
+                labels.append(ex["label"])
+            tokens = transform_list_of_texts(
+                docs,
+                tokenizer,
+                cfg.chunk_size,
+                cfg.stride,
+                cfg.minimal_chunk_length,
+                getattr(cfg, "maximal_text_length", None),
+            )
+            labels_array = np.array(labels, dtype=np.float32)
+            labels_tensor = torch.from_numpy(labels_array)
+            return {
+                "input_ids": tokens["input_ids"],
+                "attention_mask": tokens["attention_mask"],
                 "labels": labels_tensor,
             }
 
