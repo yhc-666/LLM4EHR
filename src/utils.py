@@ -79,6 +79,16 @@ class ClinicalBigBirdConfig(BaseConfig):
 
     pooling: str = "mean"
 
+
+@dataclass
+class BeltConfig(BaseConfig):
+    """Configuration for BELT models."""
+    chunk_size: int = 128
+    stride: int = 64
+    minimal_chunk_length: int = 50
+    pooling_strategy: str = "mean"
+    maximal_text_length: int | None = None
+
 @dataclass
 class TimeLLMConfig(BaseConfig):
     """Configuration for TimeLLM models."""
@@ -125,6 +135,7 @@ def parse_config_yaml(path: str) -> BaseConfig:
         "clinicalbigbird": ClinicalBigBirdConfig,
         "timellm": TimeLLMConfig,
         "gpt4mts": GPT4MTSConfig,
+        "belt": BeltConfig,
     }
     cfg_cls = cfg_map.get(model_type, BaseConfig)
     allowed = {f.name for f in fields(cfg_cls)}

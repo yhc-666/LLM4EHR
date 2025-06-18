@@ -1,0 +1,27 @@
+train_pkl: ${DATA_ROOT}/ihm/train_p2x_data.pkl
+val_pkl: ${DATA_ROOT}/ihm/val_p2x_data.pkl
+test_pkl: ${DATA_ROOT}/ihm/test_p2x_data.pkl
+
+save_path: models/ihm_belt
+
+max_seq_len: 512
+
+batch_size: 2
+num_epochs: 1
+lr: 3e-5
+weight_decay: 0.01
+warmup_ratio: 0.1
+grad_accum: 1
+pretrained_meta_model: hf-internal-testing/tiny-random-bert
+use_4bit: false
+lora: null
+model_type: belt
+chunk_size: 256
+stride: 128
+minimal_chunk_length: 20
+pooling_strategy: mean
+maximal_text_length: null
+task: ihm
+num_labels: 1
+wandb: false
+mixed_precision: "no"
