@@ -5,11 +5,11 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 save_path: models/pheno_timellm
 
 max_seq_len: 5000
-batch_size: 2
-num_epochs: 40
-lr: 1e-4
-weight_decay: 0.01
-warmup_ratio: 0.1
+batch_size: 4
+num_epochs: 15
+lr: 3e-4
+weight_decay: 0.04
+warmup_ratio: 0.05
 grad_accum: 2
 pretrained_meta_model: meta-llama/Meta-Llama-3-8B-Instruct # hf-internal-testing/tiny-random-gpt2
 use_4bit: false
@@ -24,7 +24,7 @@ stride: 2
 n_heads: 4
 # 冻结基座 LLM
 freezebasemodel: true
-enable_text: true
+enable_text: false
 model_type: timellm
 task: pheno
 num_labels: 25
