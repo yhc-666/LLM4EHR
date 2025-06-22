@@ -26,6 +26,9 @@ def collate_fn(
 
     max_length = cfg.max_seq_len
     model_type = cfg.model_type.lower()
+    use_text = True
+    if model_type == "timellm":
+        use_text = getattr(cfg, "enable_text", True)
 
     # Some smaller test tokenizers may not define a pad token. ``padding``
     # will fail in that case, so fall back to using the EOS token.
@@ -35,11 +38,11 @@ def collate_fn(
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         if model_type == "gpt4mts":
             labels, ts, tokens = [], [], []
-            use_text = getattr(cfg, "enable_text_as_prefix", True)
+            use_text_prefix = getattr(cfg, "enable_text_as_prefix", True)
             for ex in batch:
                 labels.append(ex["label"])
                 ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
-                if use_text:
+                if use_text_prefix:
                     notes = ex["text_list"][:5]
                     if not notes:
                         notes = [" "]
@@ -57,7 +60,7 @@ def collate_fn(
                 "reg_ts": torch.stack(ts),
                 "labels": labels_tensor,
             }
-            if use_text:
+            if use_text_prefix:
                 batch_dict["summary_tokens"] = tokens
                 # tokens: List of dicts, length = batch_size
                 # each dict contains "input_ids"(num_notes, max_length), "attention_mask"(num_notes, max_length)
@@ -92,11 +95,14 @@ def collate_fn(
         docs: List[str] = []
         labels = []
         for example in batch:
-            notes = example["text_list"]
+            notes = example["text_list"] if use_text else []
             notes = notes[:5]
-            joined = "\n".join(
-                [f"### NOTE {i+1} ###\n{note}" for i, note in enumerate(notes)]
-            )
+            if notes:
+                joined = "\n".join(
+                    [f"### NOTE {i+1} ###\n{note}" for i, note in enumerate(notes)]
+                )
+            else:
+                joined = ""
             docs.append(joined)
             labels.append(example["label"])
         enc = tokenizer(

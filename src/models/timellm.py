@@ -153,6 +153,8 @@ class TimeLLM(nn.Module):
         Number of heads in the reprogramming attention.
     freeze_base_model: bool, default False
         If ``True``, freeze all parameters of the base LLM.
+    enable_text: bool, default True
+        Whether to concatenate text tokens with the time-series representation.
     """
 
     def __init__(
@@ -166,6 +168,7 @@ class TimeLLM(nn.Module):
         stride: int = 8,
         n_heads: int = 8,
         freeze_base_model: bool = False,
+        enable_text: bool = True,
     ) -> None:
         super().__init__()
         quant_cfg = (
@@ -205,6 +208,7 @@ class TimeLLM(nn.Module):
         self.reprogram = ReprogrammingLayer(d_model, n_heads, hidden)
         self.classifier = nn.Linear(hidden, num_labels)
         self.num_tokens = 1000
+        self.enable_text = enable_text
 
         if freeze_base_model:
             for p in self.model.parameters():
@@ -226,15 +230,20 @@ class TimeLLM(nn.Module):
             labels: optional labels ``(B,)`` or ``(B, num_labels)``
         """
 
-        text_embeds = self.model.get_input_embeddings()(input_ids)
+        if self.enable_text:
+            text_embeds = self.model.get_input_embeddings()(input_ids)
         ts = reg_ts.permute(0, 2, 1).contiguous()  # (B, F, T)
         ts_embed, _ = self.patch_embed(ts)
         vocab_embed = self.model.get_input_embeddings().weight[: self.num_tokens]
         ts_embed = self.reprogram(ts_embed, vocab_embed)
 
         patch_mask = torch.ones(ts_embed.size(0), ts_embed.size(1), device=ts_embed.device)
-        concat_embeds = torch.cat([ts_embed, text_embeds], dim=1)
-        concat_mask = torch.cat([patch_mask, attention_mask], dim=1)
+        if self.enable_text:
+            concat_embeds = torch.cat([ts_embed, text_embeds], dim=1)
+            concat_mask = torch.cat([patch_mask, attention_mask], dim=1)
+        else:
+            concat_embeds = ts_embed
+            concat_mask = patch_mask
 
         outputs = self.model(inputs_embeds=concat_embeds, attention_mask=concat_mask, output_hidden_states=True)
         last_hidden = outputs.last_hidden_state

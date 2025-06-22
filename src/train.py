@@ -99,6 +99,7 @@ def main(config_path: str) -> None:
             stride=cfg.stride,
             n_heads=cfg.n_heads,
             freeze_base_model=cfg.freezebasemodel,
+            enable_text=cfg.enable_text,
         )
     elif cfg.model_type == "gpt4mts":
         model = GPT4MTS(

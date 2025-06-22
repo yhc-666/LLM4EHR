@@ -123,6 +123,10 @@ export DATA_ROOT=sampledata
 python -m src.train --config config/pheno_timellm.yaml
 python -m src.test --config config/pheno_timellm.yaml
 ```
+The TimeLLM configuration now includes an `enable_text` flag. Set this to
+`false` to train on time-series data only without concatenating clinical notes.
+The provided config uses the lightweight `hf-internal-testing/tiny-random-gpt2`
+model so the example scripts run quickly without heavy downloads.
 
 ## Running GPT4MTS
 To train the GPT4MTS baseline on the provided toy dataset:
