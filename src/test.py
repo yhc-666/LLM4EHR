@@ -72,6 +72,7 @@ def main(config_path: str) -> None:
             pretrain=cfg.pretrain,
             revin=cfg.revin,
             classifier_head=cfg.classifier_head,
+            enable_text_as_prefix=cfg.enable_text_as_prefix,
         )
     elif cfg.model_type == "belt":
         model = BeltForLongTexts(

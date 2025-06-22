@@ -131,3 +131,6 @@ export DATA_ROOT=sampledata
 python -m src.train --config config/ihm_gpt4mts.yaml
 python -m src.test --config config/ihm_gpt4mts.yaml
 ```
+The configuration files include an `enable_text_as_prefix` switch. Set this to
+`false` if you wish to disable using clinical notes as a prefix for the
+time-series input.
