@@ -38,7 +38,7 @@ def collate_fn(
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         if model_type == "gpt4mts":
             labels, ts, tokens = [], [], []
-            use_text_prefix = getattr(cfg, "enable_text_as_prefix", True)
+            use_text_prefix = getattr(cfg, "enable_text", True)
             for ex in batch:
                 labels.append(ex["label"])
                 ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
