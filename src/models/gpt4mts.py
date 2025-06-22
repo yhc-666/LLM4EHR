@@ -136,6 +136,8 @@ class GPT4MTS(nn.Module):
         If ``True``, load pretrained GPT2 weights, otherwise initialize from scratch.
     revin: bool, default False
         Apply reversible instance normalization on the input time series.
+    enable_text_as_prefix: bool, default True
+        Whether to prepend text embeddings before the time-series patches.
     """
 
     # NOTE: 
@@ -155,8 +157,10 @@ class GPT4MTS(nn.Module):
         pretrain: bool = True,
         revin: bool = False,
         classifier_head: str = "linear",
+        enable_text_as_prefix: bool = True,
     ) -> None:
         super().__init__()
+        self.enable_text_as_prefix = enable_text_as_prefix
         self.patch_size = patch_size
         self.stride = stride
         self.patch_num = (seq_len - patch_size) // stride + 1
@@ -277,7 +281,7 @@ class GPT4MTS(nn.Module):
     def forward(
         self,
         reg_ts: torch.Tensor,
-        summary_tokens: List[Dict[str, torch.Tensor]],
+        summary_tokens: Optional[List[Dict[str, torch.Tensor]]] = None,
         labels: Optional[torch.Tensor] = None,
     ) -> GPT4MTSOutput:
         """Forward pass.
@@ -303,13 +307,15 @@ class GPT4MTS(nn.Module):
         x = self.get_patch(reg_ts)  # Shape: (B*C, patch_num, patch_size)
         x = self.in_layer(x)  # Shape: (B*C, patch_num, d_model)
 
-        note_embeds = self.encode_notes(summary_tokens, device) # Shape: (B, d_bert)
-        summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_bert)
-        summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_bert)
-        
-        h = self.get_emb(x, summary_prompt)  # Shape: (B*C, prompt_len + patch_num, d_model)
-        
-        prompt_len = summary_prompt.size(1)
+        if self.enable_text_as_prefix and summary_tokens is not None:
+            note_embeds = self.encode_notes(summary_tokens, device)  # Shape: (B, d_bert)
+            summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_bert)
+            summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_bert)
+            h = self.get_emb(x, summary_prompt)  # Shape: (B*C, prompt_len + patch_num, d_model)
+            prompt_len = summary_prompt.size(1)
+        else:
+            h = self.get_emb(x, None)
+            prompt_len = 0
         # 从GPT输出中只取时间序列部分（跳过prompt部分）
         #h_ts = h[:, prompt_len:, :]  # Shape: (B*C, patch_num, d_model)
         # 使用所有输出

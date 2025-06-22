@@ -24,6 +24,7 @@ freeze: true
 pretrain: true
 revin: false
 classifier_head: hier # linear, hier
+enable_text_as_prefix: true
 
 model_type: gpt4mts
 task: pheno

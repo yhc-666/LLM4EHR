@@ -35,28 +35,33 @@ def collate_fn(
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
         if model_type == "gpt4mts":
             labels, ts, tokens = [], [], []
+            use_text = getattr(cfg, "enable_text_as_prefix", True)
             for ex in batch:
                 labels.append(ex["label"])
                 ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
-                notes = ex["text_list"][:5]
-                if not notes:
-                    notes = [" "]
-                enc = tokenizer(
-                    notes,
-                    padding=True,
-                    truncation=True,
-                    max_length=max_length,
-                    return_tensors="pt",
-                )
-                tokens.append(enc)
-            # 优化：先转换为numpy数组再创建tensor
+                if use_text:
+                    notes = ex["text_list"][:5]
+                    if not notes:
+                        notes = [" "]
+                    enc = tokenizer(
+                        notes,
+                        padding=True,
+                        truncation=True,
+                        max_length=max_length,
+                        return_tensors="pt",
+                    )
+                    tokens.append(enc)
             labels_array = np.array(labels, dtype=np.float32)
             labels_tensor = torch.from_numpy(labels_array)
-            return {
-                "summary_tokens": tokens,
+            batch_dict = {
                 "reg_ts": torch.stack(ts),
                 "labels": labels_tensor,
             }
+            if use_text:
+                batch_dict["summary_tokens"] = tokens
+            else:
+                batch_dict["summary_tokens"] = None
+            return batch_dict
         if model_type == "belt":
             docs, labels = [], []
             for ex in batch:

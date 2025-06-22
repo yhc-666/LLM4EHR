@@ -112,6 +112,7 @@ class GPT4MTSConfig(BaseConfig):
     pretrain: bool = True
     revin: bool = False
     classifier_head: str = "linear"
+    enable_text_as_prefix: bool = True
 
 
 def parse_config_yaml(path: str) -> BaseConfig:
