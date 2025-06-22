@@ -59,6 +59,8 @@ def collate_fn(
             }
             if use_text:
                 batch_dict["summary_tokens"] = tokens
+                # tokens: List of dicts, length = batch_size
+                # each dict contains "input_ids"(num_notes, max_length), "attention_mask"(num_notes, max_length)
             else:
                 batch_dict["summary_tokens"] = None
             return batch_dict

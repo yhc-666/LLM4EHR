@@ -248,7 +248,15 @@ class GPT4MTS(nn.Module):
     def encode_notes(
         self, notes: List[Dict[str, torch.Tensor]], device: torch.device
     ) -> List[torch.Tensor]:
-        """Encode a batch of notes with the text encoder(BERT)."""
+        """
+        Encode a batch of notes with the text encoder(BERT).
+        embeds的最终形状: 
+        - 类型: List[torch.Tensor]
+        - 列表长度: batch_size(批次中的样本数)
+        - 每个tensor的形状: (num_notes_in_sample_i, bert_hidden_size)
+        - 其中 num_notes_in_sample_i 是第i个样本包含的notes数量
+        - bert_hidden_size 通常是768(Bio_ClinicalBERT的隐藏维度)
+        """
         embeds = []
         for enc in notes:
             enc = {k: v.to(device) for k, v in enc.items()}
@@ -308,7 +316,7 @@ class GPT4MTS(nn.Module):
         x = self.in_layer(x)  # Shape: (B*C, patch_num, d_model)
 
         if self.enable_text_as_prefix and summary_tokens is not None:
-            note_embeds = self.encode_notes(summary_tokens, device)  # Shape: (B, d_bert)
+            note_embeds = self.encode_notes(summary_tokens, device)  # Shape: (B, num_notes_in_sample_i, d_bert)
             summary_prompt = self.patch_summary(note_embeds)  # Shape: (B, prompt_len, d_bert)
             summary_prompt = summary_prompt.repeat_interleave(C, dim=0)  # Shape: (B*C, prompt_len, d_bert)
             h = self.get_emb(x, summary_prompt)  # Shape: (B*C, prompt_len + patch_num, d_model)
@@ -317,11 +325,11 @@ class GPT4MTS(nn.Module):
             h = self.get_emb(x, None)
             prompt_len = 0
         # 从GPT输出中只取时间序列部分（跳过prompt部分）
-        #h_ts = h[:, prompt_len:, :]  # Shape: (B*C, patch_num, d_model)
+        h_ts = h[:, prompt_len:, :]  # Shape: (B*C, patch_num, d_model)
+        h_ts = h_ts.reshape(B, C, self.patch_num, self.d_model)
         # 使用所有输出
-        h_ts = h
-        #h_ts = h_ts.reshape(B, C, self.patch_num, self.d_model)
-        h_ts = h_ts.reshape(B, C, self.patch_num + prompt_len, self.d_model)
+        #h_ts = h
+        #h_ts = h_ts.reshape(B, C, self.patch_num + prompt_len, self.d_model)
         
         if self.classifier_head_type == "linear":
             logits = self.classifier_head(h_ts.reshape(B, -1))

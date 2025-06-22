@@ -4,26 +4,26 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 
 save_path: models/pheno_gpt4mts_hierhead
 
-max_seq_len: 128
-batch_size: 2
+max_seq_len: 500 # max length of each note 
+batch_size: 8
 num_epochs: 100
 lr: 0.0001
 weight_decay: 0.001
 warmup_ratio: 0.1
 grad_accum: 1
-pretrained_meta_model: gpt2-medium
+pretrained_meta_model: gpt2-medium #meta-llama/Meta-Llama-3-8B-Instruct #gpt2-medium
 use_4bit: false
 lora: null
 
 seq_len: 24
 patch_size: 4
 stride: 2
-gpt_layers: 6
-d_model: 1024 # hidden dim of LLM
+gpt_layers: 6 # 6 for gpt2-medium, 32 for llama-3.1-8b-instruct
+d_model: 1024 # hidden dim of LLM, 1024 for gpt2-medium, 4096 for llama-3.1-8b-instruct
 freeze: true
 pretrain: true
 revin: false
-classifier_head: hier # linear, hier
+classifier_head: linear # linear, hier
 enable_text_as_prefix: true
 
 model_type: gpt4mts
