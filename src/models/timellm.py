@@ -25,7 +25,7 @@ class TokenEmbedding(nn.Module):
     """Two-layer MLP token embedding used for patchified time series.
 
     Args:
-        c_in: number of channels in each patch (``patch_len`` × ``num_vars``)
+        c_in: number of channels in each patch (here is ``patch_len`` × ``num_vars``)
         d_model: embedding dimension of the patch tokens
 
     Input shape: ``(B, L, c_in)`` where ``L`` is number of patches.
@@ -63,13 +63,15 @@ class PatchEmbedding(nn.Module):
     Patchify multi-variate time series and embed each patch.
     Changed PatchEmbedding to combine all variables per patch
 
+    (1) 按时间维 unfold; (2) 变量维拼接；(3) MLP 降维
+
     Args:
         d_model: embedding dimension after convolution
         patch_len: patch length along the time dimension
         stride: stride for unfolding
         dropout: dropout rate applied after embedding
 
-    Input shape: ``(B, V, T)`` where ``V`` is number of variables.
+    Input shape: ``(B, V, T)`` where ``V`` is number of ts variables.
     Output shape: ``(B, L, d_model)`` where ``L`` is number of patches.
     """
 
