@@ -98,6 +98,7 @@ class TimeLLMConfig(BaseConfig):
     stride: int = 8
     n_heads: int = 8
     freezebasemodel: bool = False
+    enable_text: bool = True
 
 
 @dataclass
