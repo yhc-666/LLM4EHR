@@ -5,9 +5,9 @@ test_pkl: ${DATA_ROOT}/pheno/test_p2x_data.pkl
 save_path: models/pheno_lstm
 
 max_seq_len: 0
-batch_size: 8
-num_epochs: 3
-lr: 1e-3
+batch_size: 30
+num_epochs: 30
+lr: 5e-4
 weight_decay: 0.0
 warmup_ratio: 0.0
 grad_accum: 1
@@ -20,5 +20,5 @@ dropout: 0.1
 model_type: lstm
 task: pheno
 num_labels: 25
-wandb: false
+wandb: true
 mixed_precision: "no"
