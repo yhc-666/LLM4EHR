@@ -151,3 +151,15 @@ python -m src.test --config config/pheno_lstm.yaml
 python -m src.train --config config/ihm_lstm.yaml
 python -m src.test --config config/ihm_lstm.yaml
 ```
+
+## Running the CNN baseline
+The CNN baseline also takes only the regularised time-series as input:
+```bash
+export DATA_ROOT=sampledata
+python -m src.train --config config/cnn.yaml
+python -m src.test --config config/cnn.yaml
+
+# For the IHM task
+python -m src.train --config config/ihm_cnn.yaml
+python -m src.test --config config/ihm_cnn.yaml
+```
