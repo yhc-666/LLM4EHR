@@ -97,6 +97,15 @@ class LSTMConfig(BaseConfig):
     num_layers: int = 1
     dropout: float = 0.1
 
+
+@dataclass
+class CNNConfig(BaseConfig):
+    """Configuration for the CNN baseline."""
+
+    num_filters: int = 64
+    kernel_size: int = 3
+    dropout: float = 0.1
+
 @dataclass
 class TimeLLMConfig(BaseConfig):
     """Configuration for TimeLLM models."""
@@ -147,6 +156,7 @@ def parse_config_yaml(path: str) -> BaseConfig:
         "gpt4mts": GPT4MTSConfig,
         "belt": BeltConfig,
         "lstm": LSTMConfig,
+        "cnn": CNNConfig,
     }
     cfg_cls = cfg_map.get(model_type, BaseConfig)
     allowed = {f.name for f in fields(cfg_cls)}

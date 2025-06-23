@@ -16,6 +16,7 @@ from .models.timellm import TimeLLM
 from .models.gpt4mts import GPT4MTS
 from .models.belt import BeltForLongTexts
 from .models.lstm import LSTMClassifier
+from .models.cnn import CNNClassifier
 from .metrics import binary_metrics, multilabel_metrics
 from .utils import parse_config_yaml, set_seed, to_device
 
@@ -81,6 +82,14 @@ def main(config_path: str) -> None:
             input_dim=34,
             hidden_dim=cfg.hidden_dim,
             num_layers=cfg.num_layers,
+            num_labels=cfg.num_labels,
+            dropout=cfg.dropout,
+        )
+    elif cfg.model_type == "cnn":
+        model = CNNClassifier(
+            input_dim=34,
+            num_filters=cfg.num_filters,
+            kernel_size=cfg.kernel_size,
             num_labels=cfg.num_labels,
             dropout=cfg.dropout,
         )

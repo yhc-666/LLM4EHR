@@ -9,7 +9,15 @@ from torch import nn
 
 @dataclass
 class LSTMOutputs:
-    """Output container for :class:`LSTMClassifier`."""
+    """Output container for :class:`LSTMClassifier`.
+
+    Attributes
+    ----------
+    logits: Tensor
+        Prediction scores of shape ``(B, num_labels)``.
+    loss: Tensor | None
+        Training loss if ``labels`` are provided.
+    """
 
     logits: torch.Tensor
     loss: Optional[torch.Tensor]
@@ -30,6 +38,12 @@ class LSTMClassifier(nn.Module):
         Dimension of the prediction output.
     dropout: float, default 0.1
         Dropout applied after the LSTM layer.
+
+    Input shape
+        ``(B, T, F)`` where ``T`` is the sequence length and ``F`` the number
+        of features.
+    Output shape
+        ``(B, num_labels)`` after the final linear layer.
     """
 
     def __init__(

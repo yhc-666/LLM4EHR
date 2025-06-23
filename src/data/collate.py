@@ -36,8 +36,8 @@ def collate_fn(
         tokenizer.pad_token = tokenizer.eos_token
 
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
-        if model_type == "lstm":
-            """Collate regularised time-series and labels for the LSTM model."""
+        if model_type in {"lstm", "cnn"}:
+            """Collate regularised time-series and labels for LSTM/CNN."""
             labels, ts = [], []
             for ex in batch:
                 labels.append(ex["label"])
