@@ -9,7 +9,7 @@ export DATA_ROOT="/home/ubuntu/Virginia/output_mimic3"
 #python -m src.train --config config/pheno_gpt4mts.yaml
 #python -m src.train --config config/pheno_clinical_bigbird.yaml
 #python -m src.train --config config/pheno_belt.yaml
-python -m src.train --config config/pheno_lstm.yaml
+python -m src.train --config config/pheno_cnn.yaml
 
 
 
