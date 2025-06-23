@@ -90,6 +90,14 @@ class BeltConfig(BaseConfig):
     maximal_text_length: int | None = None
 
 @dataclass
+class LSTMConfig(BaseConfig):
+    """Configuration for the LSTM baseline."""
+
+    hidden_dim: int = 64
+    num_layers: int = 1
+    dropout: float = 0.1
+
+@dataclass
 class TimeLLMConfig(BaseConfig):
     """Configuration for TimeLLM models."""
 
@@ -138,6 +146,7 @@ def parse_config_yaml(path: str) -> BaseConfig:
         "timellm": TimeLLMConfig,
         "gpt4mts": GPT4MTSConfig,
         "belt": BeltConfig,
+        "lstm": LSTMConfig,
     }
     cfg_cls = cfg_map.get(model_type, BaseConfig)
     allowed = {f.name for f in fields(cfg_cls)}

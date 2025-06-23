@@ -11,7 +11,7 @@ import numpy as np
 
 
 def collate_fn(
-    tokenizer: PreTrainedTokenizer,
+    tokenizer: PreTrainedTokenizer | None,
     cfg: BaseConfig,
 ):
     """Create a collate function for DataLoader.
@@ -32,10 +32,22 @@ def collate_fn(
 
     # Some smaller test tokenizers may not define a pad token. ``padding``
     # will fail in that case, so fall back to using the EOS token.
-    if tokenizer.pad_token_id is None:
+    if tokenizer is not None and tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     def _fn(batch: List[Dict[str, Any]]) -> Dict[str, Any]:
+        if model_type == "lstm":
+            """Collate regularised time-series and labels for the LSTM model."""
+            labels, ts = [], []
+            for ex in batch:
+                labels.append(ex["label"])
+                ts.append(torch.tensor(ex["reg_ts"], dtype=torch.float32))
+            labels_array = np.array(labels, dtype=np.float32)
+            labels_tensor = torch.from_numpy(labels_array)
+            return {
+                "reg_ts": torch.stack(ts),  # (B, T, F)
+                "labels": labels_tensor,  # (B,) or (B, num_labels)
+            }
         if model_type == "gpt4mts":
             labels, ts, tokens = [], [], []
             use_text_prefix = getattr(cfg, "enable_text", True)

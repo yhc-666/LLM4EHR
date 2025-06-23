@@ -57,6 +57,8 @@ class MIMICDataset(Dataset):
         out = {"text_list": texts_sorted, "label": label}
         if self.model_type in {"timellm", "gpt4mts"}:
             out["reg_ts"] = item["reg_ts"][:, :17].astype(np.float32)
+        elif self.model_type == "lstm":
+            out["reg_ts"] = item["reg_ts"].astype(np.float32)
         elif self.model_type == "clinicalbigbird":
             pass  # same as text-only models
         return out
