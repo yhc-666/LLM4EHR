@@ -73,6 +73,7 @@ def main(config_path: str) -> None:
             cfg.num_labels,
             use_4bit=cfg.use_4bit,
             lora_cfg=cfg.lora,
+            freeze=cfg.freeze,
         )
     elif cfg.model_type == "clinicallongformer":
         model = ClinicalLongformerPool(
