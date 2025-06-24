@@ -17,6 +17,7 @@ lora:
   r: 16
   lora_alpha: 32
   lora_dropout: 0.05
+freeze: false
 model_type: llama
 task: pheno
 num_labels: 25

@@ -65,6 +65,7 @@ class BaseConfig:
 class LlamaConfig(BaseConfig):
     """Configuration for Llama models."""
 
+    freeze: bool = False
 
 @dataclass
 class ClinicalLongformerConfig(BaseConfig):

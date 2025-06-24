@@ -21,7 +21,22 @@ class LlamaOutputs:
 
 
 class LlamaMeanPool(nn.Module):
-    """Llama model with masked mean pooling head."""
+    """Llama model with masked mean pooling head.
+
+    Parameters
+    ----------
+    model_name:
+        Name of the pretrained Llama model.
+    num_labels:
+        Number of prediction labels.
+    use_4bit:
+        Whether to load the base model in 4-bit mode.
+    lora_cfg:
+        Optional LoRA configuration.
+    freeze:
+        If ``True``, freeze all Llama parameters and only train the
+        classification head.
+    """
 
     def __init__(
         self,
@@ -29,6 +44,7 @@ class LlamaMeanPool(nn.Module):
         num_labels: int,
         use_4bit: bool = False,
         lora_cfg: Optional[Dict[str, int]] = None,
+        freeze: bool = False,
     ) -> None:
         super().__init__()
         quant_cfg = (
@@ -56,6 +72,10 @@ class LlamaMeanPool(nn.Module):
 
         self.model.gradient_checkpointing_enable()  # 节省大量激活显存!!!(影响最大)  
         self.model.enable_input_require_grads()     # 让 checkpoint 反向链路完整
+
+        if freeze:
+            for p in self.model.parameters():
+                p.requires_grad = False
 
         self.tokenizer: PreTrainedTokenizerBase = AutoTokenizer.from_pretrained(
             model_name, use_fast=True
